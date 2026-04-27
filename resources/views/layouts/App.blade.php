@@ -524,7 +524,7 @@
         </div>
 
         <div class="sidebar-footer">
-            {{-- <form method="POST" action="{{ route('logout') }}">
+            <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <a href="{{ route('logout') }}"
                    onclick="event.preventDefault(); this.closest('form').submit();"
@@ -536,7 +536,7 @@
                     </div>
                     <i class="bi bi-box-arrow-right" style="font-size: 14px;"></i>
                 </a>
-            </form> --}}
+            </form>
         </div>
     </nav>
 
