@@ -183,10 +183,13 @@
     <!-- En-tête -->
     <div class="header">
         <div class="header-left">
-            <div class="company-name">⚙ GestPro</div>
-            <div class="company-sub">Système de Gestion Commerciale</div>
-            <div class="company-sub" style="margin-top: 8px;">📍 Casablanca, Maroc</div>
-            <div class="company-sub">📞 +212 6XX-XXXXXX</div>
+            {{-- <div class="company-name">⚙ GestPro</div> --}}
+           <div class="company-name">
+    <img src="{{ public_path('storage/images/Logo.png') }}" alt="Logo" style="height: 80px;">
+</div>
+            <div class="company-sub">Ste. CHARRAK TECHNOLOGIE</div>
+            <div class="company-sub" style="margin-top: 8px;">📍 Fès, Maroc</div>
+            <div class="company-sub">📞 +212 622-390028</div>
         </div>
         <div class="header-right">
             <div class="invoice-title">FACTURE</div>
@@ -287,8 +290,12 @@
 
     <!-- Pied de page -->
     <div class="footer" style="margin-top: 40px;">
-        <div>Merci pour votre confiance — GestPro • Gestion Commerciale Professionnelle</div>
-        <div style="margin-top: 4px;">Ce document est généré automatiquement. Pour toute question : contact@gestpro.ma</div>
+        <div style="margin-top: 4px;">
+            1 RUE 1 HY SIDI HADI ZOUAGHA RCE NOUR MAG 2 30000 SECTEUR 0502 FES <br>
+                **TEL 06 22 39 00 28***IF68334179***ICE003778507000061 <br>
+                        COMPTE BANQUER 011270000023210000549604
+    </div>
+
     </div>
 
 </div>

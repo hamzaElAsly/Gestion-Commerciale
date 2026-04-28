@@ -197,8 +197,8 @@ class HistoriqueController extends Controller
 
     public function imprimerMensuel(Request $request)
     {
-        $mois = $request->get('mois', now()->month);
-        $annee = $request->get('annee', now()->year);
+        $mois  = (int) $request->get('mois', now()->month);
+        $annee = (int) $request->get('annee', now()->year);
         $idClient = $request->get('id_client');
 
         $query = Historique::with(['client', 'details.produit'])
@@ -219,7 +219,6 @@ class HistoriqueController extends Controller
             $pdf = Pdf::loadView('pdf.historique-mensuel', compact(
                 'historiques', 'totalMois', 'nomMois', 'annee', 'mois'
             ))->setPaper('a4', 'portrait');
-
             return $pdf->download("historique-{$nomMois}-{$annee}.pdf");
         }
 
