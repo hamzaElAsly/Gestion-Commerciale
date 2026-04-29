@@ -6,15 +6,12 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('clients', function (Blueprint $table) {
             $table->id('id_client');
             $table->string('nom', 100);
-            $table->integer('ICE')->unique();
+            $table->string('ICE', 50)->nullable()->unique();
             $table->string('telephone', 20)->nullable();
             $table->text('adresse')->nullable();
             $table->timestamp('date_creation')->useCurrent();

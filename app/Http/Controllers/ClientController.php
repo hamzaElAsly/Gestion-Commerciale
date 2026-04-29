@@ -31,11 +31,14 @@ class ClientController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nom' => 'required|string|max:100',
+            'nom' => 'required|nullable|string|max:100', //'digits:15','unique:clients,ICE'
+            'ICE' => 'required|string|max:50',
             'telephone' => 'nullable|string|max:20',
             'adresse' => 'nullable|string',
         ], [
             'nom.required' => 'Le nom du client est obligatoire.',
+            'ICE.required' => 'L\'ICE est obligatoire.',
+            'ICE.max' => 'L\'ICE ne doit pas dépasser 50 caractères.',
             'nom.max' => 'Le nom ne doit pas dépasser 100 caractères.',
         ]);
         Client::create($validated);

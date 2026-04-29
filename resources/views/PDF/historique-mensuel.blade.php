@@ -55,9 +55,17 @@
         .detail-prod span { margin-right: 8px; }
 
         .footer {
-            margin-top: 30px; border-top: 1px solid #e2e8f0;
-            padding-top: 12px; text-align: center;
-            color: #94a3b8; font-size: 9px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            text-align: center;
+            font-size: 10px;
+            color: #94a3b8;
+            border-top: 2px solid #e2e8f0;
+            margin-top: 30px; 
+            padding-top: 16px;
         }
 
         .page-break { page-break-after: always; }
@@ -69,14 +77,17 @@
     <!-- En-tête -->
     <div class="header">
         <div class="header-left">
+            <div class="company" style="font-size:16px;font-weight:bold;color:#1a56db;">
+                <img src="{{ public_path('storage/images/Logo.png') }}" alt="Logo" style="height: 80px;">
+            </div>
+            <div class="company">Ste. CHARRAK TECHNOLOGIE</div>
+            <div class="company" style="margin-top:6px;">Imprimé le {{ now()->format('d/m/Y') }}</div>{{--  à H:i --}}
+        </div>
+        <div class="header-right">
             <div class="report-title">Rapport Mensuel des Services</div>
             <div class="report-sub">{{ ucfirst($nomMois) }} {{ $annee }}</div>
         </div>
-        <div class="header-right">
-            <div class="company" style="font-size:16px;font-weight:bold;color:#1a56db;">⚙ GestPro</div>
-            <div class="company">Gestion Commerciale</div>
-            <div class="company" style="margin-top:6px;">Imprimé le {{ now()->format('d/m/Y à H:i') }}</div>
-        </div>
+        
     </div>
 
     <!-- Statistiques -->

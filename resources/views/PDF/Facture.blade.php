@@ -156,11 +156,16 @@
 
         /* Footer */
         .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            text-align: center;
+            font-size: 10px;
+            color: #94a3b8;
             border-top: 2px solid #e2e8f0;
             padding-top: 16px;
-            text-align: center;
-            color: #94a3b8;
-            font-size: 10px;
         }
 
         /* Status badge */
@@ -185,7 +190,7 @@
         <div class="header-left">
            <div class="company-name">
     <img src="{{ public_path('storage/images/Logo.png') }}" alt="Logo" style="height: 80px;">
-</div>
+        </div>
             <div class="company-sub">Ste. CHARRAK TECHNOLOGIE</div>
             <div class="company-sub" style="margin-top: 8px;">📍 Fès, Maroc</div>
             <div class="company-sub">📞 +212 622-390028</div>
@@ -194,7 +199,7 @@
             <div class="invoice-title">FACTURE</div>
             <div class="invoice-number">#{{ str_pad($historique->id_historique, 6, '0', STR_PAD_LEFT) }}</div>
             <div style="margin-top: 8px; font-size: 12px; color: #64748b;">
-                Date : {{ $historique->date_service->format('d/m/Y à H:i') }}
+                Date : {{ $historique->date_service->format('d/m/Y') }} {{--  à H:i --}}
             </div>
             <div style="margin-top: 6px;">
                 <span class="status-badge status-{{ $historique->statut }}">
@@ -219,14 +224,14 @@
         <div style="display: table-cell; width: 50%; vertical-align: top; padding-left: 30px;">
             <div class="info-label">Détails de la facture</div>
             <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">
-                N° Facture : <strong style="color: #0f172a;">#{{ str_pad($historique->id_historique, 6, '0', STR_PAD_LEFT) }}</strong>
+                N° ICE : <strong style="color: #0f172a;">{{ str_pad($historique->client->ICE, 10, '0', STR_PAD_LEFT) }}</strong>
             </div>
-            <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">
+            {{-- <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">
                 Date service : <strong style="color: #0f172a;">{{ $historique->date_service->format('d/m/Y') }}</strong>
             </div>
             <div style="font-size: 12px; color: #64748b;">
                 Imprimé le : <strong style="color: #0f172a;">{{ now()->format('d/m/Y à H:i') }}</strong>
-            </div>
+            </div> --}}
         </div>
     </div>
 
@@ -239,7 +244,7 @@
             <tr>
                 <th style="width: 5%;">#</th>
                 <th style="width: 40%;">Produit / Service</th>
-                <th style="width: 20%;">Catégorie</th>
+                {{-- <th style="width: 20%;">Catégorie</th> --}}
                 <th style="width: 10%; text-align: center;">Qté</th>
                 <th style="width: 12%; text-align: right;">Prix Unit.</th>
                 <th style="width: 13%; text-align: right;">Total</th>
@@ -250,7 +255,7 @@
             <tr>
                 <td style="color: #94a3b8;">{{ $idx + 1 }}</td>
                 <td style="font-weight: 600;">{{ $detail->produit->nom_produit ?? 'N/A' }}</td>
-                <td style="color: #64748b;">{{ $detail->produit->categorie->nom_categorie ?? '—' }}</td>
+                {{-- <td style="color: #64748b;">{{ $detail->produit->categorie->nom_categorie ?? '—' }}</td> --}}
                 <td style="text-align: center; font-weight: bold;">{{ $detail->quantite_utilisee }}</td>
                 <td style="text-align: right; font-family: monospace;">{{ number_format($detail->prix_unitaire, 2) }} MAD</td>
                 <td style="text-align: right; font-family: monospace; font-weight: bold;">{{ number_format($detail->prix_total, 2) }} MAD</td>

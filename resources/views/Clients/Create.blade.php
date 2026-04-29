@@ -36,6 +36,15 @@
                     </div>
 
                     <div class="mb-4">
+                        <label class="form-label">ICE</label>
+                        <input type="text" name="ICE" class="form-control @error('ICE') is-invalid @enderror"
+                               value="{{ old('ICE') }}" placeholder="Ex: ICE123456">
+                        @error('ICE')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-4">
                         <label class="form-label">Téléphone</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-telephone"></i></span>
