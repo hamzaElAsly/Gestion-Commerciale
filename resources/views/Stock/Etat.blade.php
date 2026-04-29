@@ -84,8 +84,8 @@
         <table class="table mb-0">
             <thead>
                 <tr>
-                    <th>Produit</th>
-                    <th>Catégorie</th>
+                    <th>Produitttt</th>
+                    {{-- <th>Catégorie</th> --}}
                     <th class="text-center">Stock actuel</th>
                     <th class="text-center">Seuil</th>
                     <th>Statut</th>
@@ -96,7 +96,7 @@
                 @foreach($produits->where('statut_stock', '!=', 'normal') as $p)
                 <tr>
                     <td class="fw-semibold">{{ $p->nom_produit }}</td>
-                    <td><span class="badge bg-light text-dark border">{{ $p->categorie->nom_categorie ?? '—' }}</span></td>
+                    {{-- <td><span class="badge bg-light text-dark border">{{ $p->categorie->nom_categorie ?? '—' }}</span></td> --}}
                     <td class="text-center">
                         <span class="fw-bold" style="font-size:16px; color: {{ $p->statut_stock === 'rupture' ? '#dc2626' : '#d97706' }}">
                             {{ $p->quantite_stock }}
@@ -134,7 +134,7 @@
             <thead>
                 <tr>
                     <th>Produit</th>
-                    <th>Catégorie</th>
+                    {{-- <th>Catégorie</th> --}}
                     <th class="text-end">Prix Unit.</th>
                     <th class="text-center">Stock</th>
                     <th class="text-center">Seuil</th>
@@ -151,7 +151,7 @@
                             {{ $p->nom_produit }}
                         </a>
                     </td>
-                    <td><span class="badge bg-light text-dark border">{{ $p->categorie->nom_categorie ?? '—' }}</span></td>
+                    {{-- <td><span class="badge bg-light text-dark border">{{ $p->categorie->nom_categorie ?? '—' }}</span></td> --}}
                     <td class="text-end money">{{ number_format($p->prix_unitaire, 2) }}</td>
                     <td class="text-center">
                         <span class="fw-bold" style="font-size:15px;">{{ $p->quantite_stock }}</span>

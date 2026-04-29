@@ -183,7 +183,6 @@
     <!-- En-tête -->
     <div class="header">
         <div class="header-left">
-            {{-- <div class="company-name">⚙ GestPro</div> --}}
            <div class="company-name">
     <img src="{{ public_path('storage/images/Logo.png') }}" alt="Logo" style="height: 80px;">
 </div>

@@ -32,7 +32,7 @@
                         @error('nom_produit')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
-                    <div class="mb-3">
+                    {{-- <div class="mb-3">
                         <label class="form-label">Catégorie <span class="text-danger">*</span></label>
                         <select name="id_categorie" class="form-select @error('id_categorie') is-invalid @enderror" required>
                             <option value="">— Sélectionner —</option>
@@ -44,7 +44,7 @@
                             @endforeach
                         </select>
                         @error('id_categorie')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                    </div>
+                    </div> --}}
 
                     <div class="row g-3 mb-3">
                         <div class="col-md-4">

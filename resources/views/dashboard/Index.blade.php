@@ -78,19 +78,17 @@
                 <table class="table mb-0">
                     <thead>
                         <tr>
-                            <th>#</th>
                             <th>Client</th>
                             <th>Date</th>
                             <th>Produits</th>
                             <th>Montant</th>
                             <th>Statut</th>
-                            <th></th>
+                            <th>Voir</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($derniersServices as $service)
                         <tr>
-                            <td class="text-muted">#{{ $service->id_historique }}</td>
                             <td>
                                 <div class="d-flex align-items-center gap-2">
                                     <div class="avatar" style="width:30px;height:30px;font-size:12px;">

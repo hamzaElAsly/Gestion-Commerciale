@@ -51,7 +51,7 @@ class DashboardController extends Controller
         $alertesStock = Produit::with('categorie')
             ->stockFaible()
             ->orderBy('quantite_stock')
-            ->limit(10)
+            ->limit(5)
             ->get();
 
         // Top clients

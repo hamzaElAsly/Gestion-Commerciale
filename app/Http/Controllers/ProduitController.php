@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Produit;
-use App\Models\Categorie;
+// use App\Models\Categorie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -12,15 +12,8 @@ class ProduitController extends Controller
     public function index(Request $request)
     {
         $query = Produit::with('categorie');
-
-        if ($request->filled('search')) {
-            $query->where('nom_produit', 'LIKE', "%{$request->search}%");
-        }
-
-        if ($request->filled('categorie')) {
-            $query->where('id_categorie', $request->categorie);
-        }
-
+        if ($request->filled('search')) { $query->where('nom_produit', 'LIKE', "%{$request->search}%"); }
+        // if ($request->filled('categorie')) { $query->where('id_categorie', $request->categorie); }
         if ($request->filled('stock')) {
             match($request->stock) {
                 'faible' => $query->stockFaible()->where('quantite_stock', '>', 0),
@@ -31,30 +24,30 @@ class ProduitController extends Controller
         }
 
         $produits = $query->orderBy('nom_produit')->paginate(15)->withQueryString();
-        $categories = Categorie::orderBy('nom_categorie')->get();
+        // $categories = Categorie::orderBy('nom_categorie')->get();
 
-        return view('produits.index', compact('produits', 'categories'));
+        return view('produits.index', compact('produits')); //'categories'
     }
 
     public function create()
     {
-        $categories = Categorie::orderBy('nom_categorie')->get();
-        return view('produits.create', compact('categories'));
+        // $categories = Categorie::orderBy('nom_categorie')->get();
+        return view('produits.create'); //compact('categories')
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'nom_produit' => 'required|string|max:150',
-            'id_categorie' => 'required|exists:categories,id_categorie',
+            // 'id_categorie' => 'required|exists:categories,id_categorie',
             'prix_unitaire' => 'required|numeric|min:0',
             'quantite_stock' => 'required|integer|min:0',
             'seuil_alerte' => 'required|integer|min:0',
             'description' => 'nullable|string',
         ], [
             'nom_produit.required' => 'Le nom du produit est obligatoire.',
-            'id_categorie.required' => 'La catégorie est obligatoire.',
-            'id_categorie.exists' => 'La catégorie sélectionnée n\'existe pas.',
+            // 'id_categorie.required' => 'La catégorie est obligatoire.',
+            // 'id_categorie.exists' => 'La catégorie sélectionnée n\'existe pas.',
             'prix_unitaire.required' => 'Le prix unitaire est obligatoire.',
             'prix_unitaire.numeric' => 'Le prix doit être un nombre.',
             'quantite_stock.required' => 'La quantité en stock est obligatoire.',
@@ -70,9 +63,7 @@ class ProduitController extends Controller
                 'description' => 'Stock initial lors de la création du produit',
             ]);
         }
-
-        return redirect()->route('produits.index')
-            ->with('success', 'Produit ajouté avec succès.');
+        return redirect()->route('produits.index')->with('success', 'Produit ajouté avec succès.');
     }
 
     public function show(Produit $produit)
@@ -87,15 +78,15 @@ class ProduitController extends Controller
 
     public function edit(Produit $produit)
     {
-        $categories = Categorie::orderBy('nom_categorie')->get();
-        return view('produits.edit', compact('produit', 'categories'));
+        // $categories = Categorie::orderBy('nom_categorie')->get();
+        return view('produits.edit', compact('produit'));//'categories'
     }
 
     public function update(Request $request, Produit $produit)
     {
         $validated = $request->validate([
             'nom_produit' => 'required|string|max:150',
-            'id_categorie' => 'required|exists:categories,id_categorie',
+            // 'id_categorie' => 'required|exists:categories,id_categorie',
             'prix_unitaire' => 'required|numeric|min:0',
             'quantite_stock' => 'required|integer|min:0',
             'seuil_alerte' => 'required|integer|min:0',
@@ -115,16 +106,13 @@ class ProduitController extends Controller
             ]);
         }
 
-        return redirect()->route('produits.index')
-            ->with('success', 'Produit modifié avec succès.');
+        return redirect()->route('produits.index')->with('success', 'Produit modifié avec succès.');
     }
 
     public function destroy(Produit $produit)
     {
         $produit->delete();
-
-        return redirect()->route('produits.index')
-            ->with('success', 'Produit supprimé avec succès.');
+        return redirect()->route('produits.index')->with('success', 'Produit supprimé avec succès.');
     }
 
     public function ajouterStock(Request $request, Produit $produit)
@@ -133,13 +121,10 @@ class ProduitController extends Controller
             'quantite' => 'required|integer|min:1',
             'description' => 'nullable|string|max:255',
         ]);
-
         $produit->incrementerStock(
             $validated['quantite'],
             $validated['description'] ?? 'Ajout de stock'
         );
-
-        return redirect()->back()
-            ->with('success', "Stock mis à jour : +{$validated['quantite']} unités.");
+        return redirect()->back()->with('success', "Stock mis à jour : +{$validated['quantite']} unités.");
     }
 }

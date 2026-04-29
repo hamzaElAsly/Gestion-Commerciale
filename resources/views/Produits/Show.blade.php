@@ -27,10 +27,10 @@
             <div class="card-header"><i class="bi bi-info-circle me-2 text-primary"></i>Informations</div>
             <div class="card-body">
                 <table class="table table-sm mb-0">
-                    <tr>
+                    {{-- <tr>
                         <td class="text-muted">Catégorie</td>
                         <td><span class="badge bg-light text-dark border">{{ $produit->categorie->nom_categorie ?? '—' }}</span></td>
-                    </tr>
+                    </tr> --}}
                     <tr>
                         <td class="text-muted">Prix unitaire</td>
                         <td class="money fw-bold">{{ number_format($produit->prix_unitaire, 2) }} MAD</td>

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class ClientController extends Controller
 {
@@ -27,10 +26,7 @@ class ClientController extends Controller
         return view('clients.index', compact('clients'));
     }
 
-    public function create()
-    {
-        return view('clients.create');
-    }
+    public function create() { return view('clients.create'); }
 
     public function store(Request $request)
     {
@@ -42,11 +38,9 @@ class ClientController extends Controller
             'nom.required' => 'Le nom du client est obligatoire.',
             'nom.max' => 'Le nom ne doit pas dépasser 100 caractères.',
         ]);
-
         Client::create($validated);
 
-        return redirect()->route('clients.index')
-            ->with('success', 'Client ajouté avec succès.');
+        return redirect()->route('clients.index')->with('success', 'Client ajouté avec succès.');
     }
 
     public function show(Client $client)
@@ -60,10 +54,7 @@ class ClientController extends Controller
         return view('clients.show', compact('client', 'historiques'));
     }
 
-    public function edit(Client $client)
-    {
-        return view('clients.edit', compact('client'));
-    }
+    public function edit(Client $client) { return view('clients.edit', compact('client')); }
 
     public function update(Request $request, Client $client)
     {
@@ -72,7 +63,6 @@ class ClientController extends Controller
             'telephone' => 'nullable|string|max:20',
             'adresse' => 'nullable|string',
         ]);
-
         $client->update($validated);
 
         return redirect()->route('clients.index')

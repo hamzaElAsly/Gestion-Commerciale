@@ -27,7 +27,7 @@
                     <input type="text" name="search" class="form-control form-control-sm" placeholder="Rechercher un produit..." value="{{ request('search') }}">
                 </div>
             </div>
-            <div class="col-md-3">
+            {{-- <div class="col-md-3">
                 <select name="categorie" class="form-select form-select-sm">
                     <option value="">Toutes les catégories</option>
                     @foreach($categories as $cat)
@@ -36,7 +36,7 @@
                         </option>
                     @endforeach
                 </select>
-            </div>
+            </div> --}}
             <div class="col-md-2">
                 <select name="stock" class="form-select form-select-sm">
                     <option value="">Tout le stock</option>
@@ -61,8 +61,8 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Produit</th>
-                    <th>Catégorie</th>
+                    <th colspan="2">Produit</th>
+                    {{-- <th>Catégorie</th> --}}
                     <th class="text-end">Prix Unitaire</th>
                     <th class="text-center">Stock Actuel</th>
                     <th class="text-center">Seuil Alerte</th>
@@ -74,17 +74,17 @@
                 @forelse($produits as $produit)
                 <tr class="{{ $produit->statut_stock === 'rupture' ? 'table-danger-subtle' : ($produit->statut_stock === 'faible' ? 'table-warning-subtle' : '') }}">
                     <td class="text-muted">{{ $produit->id_produit }}</td>
-                    <td>
+                    <td colspan="2">
                         <div class="fw-semibold">{{ $produit->nom_produit }}</div>
                         @if($produit->description)
                             <div class="text-muted" style="font-size:11.5px;">{{ Str::limit($produit->description, 60) }}</div>
                         @endif
                     </td>
-                    <td>
+                    {{-- <td>
                         <span class="badge bg-light text-dark border">
                             {{ $produit->categorie->nom_categorie ?? '—' }}
                         </span>
-                    </td>
+                    </td> --}}
                     <td class="text-end money">{{ number_format($produit->prix_unitaire, 2) }} MAD</td>
                     <td class="text-center">
                         <span class="fw-bold" style="font-size:15px;">{{ $produit->quantite_stock }}</span>

@@ -44,7 +44,7 @@
             <div class="col-6">
                 <div class="stat-card">
                     <div>
-                        <div class="stat-value">{{ $client->historiques_count }}</div>
+                        <div class="stat-value">{{ $client->historiques_count }} 0</div>
                         <div class="stat-label">Services</div>
                     </div>
                 </div>
