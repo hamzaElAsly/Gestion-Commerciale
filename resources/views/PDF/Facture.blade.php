@@ -188,9 +188,9 @@
     <!-- En-tête -->
     <div class="header">
         <div class="header-left">
-           <div class="company-name">
-    <img src="{{ public_path('storage/images/Logo.png') }}" alt="Logo" style="height: 80px;">
-        </div>
+            <div class="company-name">
+                <img src="{{ public_path('storage/images/Logo.png') }}" alt="Logo" style="height: 80px;">
+            </div>
             <div class="company-sub">Ste. CHARRAK TECHNOLOGIE</div>
             <div class="company-sub" style="margin-top: 8px;">📍 Fès, Maroc</div>
             <div class="company-sub">📞 +212 622-390028</div>

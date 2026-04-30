@@ -61,13 +61,14 @@
             border-bottom: 1px solid rgba(255,255,255,.08);
             display: flex;
             align-items: center;
+            background-color: lightcyan;
             gap: 12px;
             min-height: var(--topbar-height);
         }
 
         .brand-icon {
             width: 36px; height: 36px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
             border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
             color: white;
@@ -472,10 +473,10 @@
     <!-- ===== SIDEBAR ===== -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <div class="brand-icon">G</div>
+            <div class="brand-icon"><img src="{{ asset('images/Logo.png') }}"style="width: 30px;" alt="Logo"></div>
             <div>
-                <div class="brand-name">GestPro</div>
-                <div class="brand-sub">Gestion Commerciale</div>
+                <div class="brand-name"><img src="{{ asset('images/Logo_Name.png') }}"style="width: 160px;" alt="Logo"></div>{{--  --}}
+                {{-- <div class="brand-sub">Ste. CHARRAK TECHNOLOGIE</div> --}}
             </div>
         </div>
 
@@ -500,9 +501,9 @@
 
             <div class="nav-section-title">Catalogue</div>
 
-            <a href="{{ route('categories.index') }}" class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}">
+            {{-- <a href="{{ route('categories.index') }}" class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}">
                 <i class="bi bi-tags-fill"></i> Catégories
-            </a>
+            </a> --}}
 
             <a href="{{ route('produits.index') }}" class="nav-link {{ request()->routeIs('produits.*') ? 'active' : '' }}">
                 <i class="bi bi-box-seam-fill"></i> Produits

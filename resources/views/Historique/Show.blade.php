@@ -84,8 +84,8 @@
                 <table class="table mb-0">
                     <thead>
                         <tr>
-                            <th>Produit</th>
-                            <th>Catégorie</th>
+                            <th colspan="2">Produit</th>
+                            {{-- <th>Catégorie</th> --}}
                             <th class="text-center">Quantité</th>
                             <th class="text-end">Prix Unitaire</th>
                             <th class="text-end">Total</th>
@@ -94,12 +94,12 @@
                     <tbody>
                         @foreach($historique->details as $detail)
                         <tr>
-                            <td class="fw-semibold">{{ $detail->produit->nom_produit ?? 'N/A' }}</td>
-                            <td>
+                            <td class="fw-semibold" colspan="2">{{ $detail->produit->nom_produit ?? 'N/A' }}</td>
+                            {{-- <td>
                                 <span class="badge bg-light text-dark border">
                                     {{ $detail->produit->categorie->nom_categorie ?? '—' }}
                                 </span>
-                            </td>
+                            </td> --}}
                             <td class="text-center">{{ $detail->quantite_utilisee }}</td>
                             <td class="text-end money">{{ number_format($detail->prix_unitaire, 2) }}</td>
                             <td class="text-end money fw-semibold">{{ number_format($detail->prix_total, 2) }}</td>
