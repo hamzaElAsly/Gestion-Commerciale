@@ -62,6 +62,16 @@
                             @error('prix_unitaire')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                         <div class="col-md-4">
+                            <label class="form-label">Prix Vente (MAD) <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="number" name="prix_vente" step="0.01" min="0"
+                                       class="form-control @error('prix_vente') is-invalid @enderror"
+                                       value="{{ old('prix_vente', '0.00') }}" required>
+                                <span class="input-group-text">MAD</span>
+                            </div>
+                            @error('prix_vente')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-4">
                             <label class="form-label">Quantité en stock <span class="text-danger">*</span></label>
                             <input type="number" name="quantite_stock" min="0"
                                    class="form-control @error('quantite_stock') is-invalid @enderror"

@@ -15,7 +15,7 @@ class DetailHistorique extends Model
         'id_historique',
         'id_produit',
         'quantite_utilisee',
-        'prix_unitaire',
+        'prix_vente',
         'prix_total',
     ];
 

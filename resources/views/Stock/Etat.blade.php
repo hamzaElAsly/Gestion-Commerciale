@@ -135,7 +135,7 @@
                 <tr>
                     <th>Produit</th>
                     {{-- <th>Catégorie</th> --}}
-                    <th class="text-end">Prix Unit.</th>
+                    <th class="text-end">Prix Vente</th>
                     <th class="text-center">Stock</th>
                     <th class="text-center">Seuil</th>
                     <th>Statut</th>
@@ -152,7 +152,7 @@
                         </a>
                     </td>
                     {{-- <td><span class="badge bg-light text-dark border">{{ $p->categorie->nom_categorie ?? '—' }}</span></td> --}}
-                    <td class="text-end money">{{ number_format($p->prix_unitaire, 2) }}</td>
+                    <td class="text-end money">{{ number_format($p->prix_vente, 2) }}</td>
                     <td class="text-center">
                         <span class="fw-bold" style="font-size:15px;">{{ $p->quantite_stock }}</span>
                     </td>
@@ -166,7 +166,7 @@
                             @endif
                         </span>
                     </td>
-                    <td class="text-end money">{{ number_format($p->prix_unitaire * $p->quantite_stock, 2) }}</td>
+                    <td class="text-end money">{{ number_format($p->prix_vente * $p->quantite_stock, 2) }}</td>
                     <td class="text-center">
                         <div class="d-flex gap-1 justify-content-center">
                             <a href="{{ route('produits.show', $p) }}" class="btn btn-sm btn-light">

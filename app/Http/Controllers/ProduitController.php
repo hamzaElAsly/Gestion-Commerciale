@@ -41,6 +41,7 @@ class ProduitController extends Controller
             'nom_produit' => 'required|string|max:150',
             // 'id_categorie' => 'required|exists:categories,id_categorie',
             'prix_unitaire' => 'required|numeric|min:0',
+            'prix_vente' => 'required|numeric|min:0|gt:prix_unitaire',
             'quantite_stock' => 'required|integer|min:0',
             'seuil_alerte' => 'required|integer|min:0',
             'description' => 'nullable|string',
@@ -50,6 +51,9 @@ class ProduitController extends Controller
             // 'id_categorie.exists' => 'La catégorie sélectionnée n\'existe pas.',
             'prix_unitaire.required' => 'Le prix unitaire est obligatoire.',
             'prix_unitaire.numeric' => 'Le prix doit être un nombre.',
+            'prix_vente.required' => 'Le prix de vente est obligatoire.',
+            'prix_vente.numeric' => 'Le prix de vente doit être un nombre.',
+            'prix_vente.gt' => 'Le prix de vente doit être supérieur au prix unitaire.',
             'quantite_stock.required' => 'La quantité en stock est obligatoire.',
         ]);
 
@@ -88,6 +92,7 @@ class ProduitController extends Controller
             'nom_produit' => 'required|string|max:150',
             // 'id_categorie' => 'required|exists:categories,id_categorie',
             'prix_unitaire' => 'required|numeric|min:0',
+            'prix_vente' => 'required|numeric|min:0|gt:prix_unitaire',
             'quantite_stock' => 'required|integer|min:0',
             'seuil_alerte' => 'required|integer|min:0',
             'description' => 'nullable|string',

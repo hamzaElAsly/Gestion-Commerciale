@@ -16,6 +16,7 @@ class Produit extends Model
         'nom_produit',
         'id_categorie',
         'prix_unitaire',
+        'prix_vente',
         'quantite_stock',
         'seuil_alerte',
         'description',
@@ -24,6 +25,7 @@ class Produit extends Model
 
     protected $casts = [
         'prix_unitaire' => 'decimal:2',
+        'prix_vente' => 'decimal:2',
         'date_ajout' => 'datetime',
     ];
 

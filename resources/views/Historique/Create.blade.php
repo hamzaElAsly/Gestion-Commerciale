@@ -128,7 +128,7 @@
                     <option value="">— Choisir —</option>
                     @foreach($produits as $p)
                         <option value="{{ $p->id_produit }}"
-                                data-prix="{{ $p->prix_unitaire }}"
+                                data-prix="{{ $p->prix_vente }}"
                                 data-stock="{{ $p->quantite_stock }}"
                                 data-statut="{{ $p->statut_stock }}">
                             {{ $p->nom_produit }} (stock: {{ $p->quantite_stock }})

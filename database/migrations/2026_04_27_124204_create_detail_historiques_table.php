@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('id_historique')->constrained('historiques', 'id_historique')->onDelete('cascade');
             $table->foreignId('id_produit')->constrained('produits', 'id_produit')->onDelete('restrict');
             $table->integer('quantite_utilisee');
-            $table->decimal('prix_unitaire', 10, 2);
+            $table->decimal('prix_vente', 10, 2);
             $table->decimal('prix_total', 10, 2);
             $table->timestamps();
         });

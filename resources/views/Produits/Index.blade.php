@@ -64,6 +64,7 @@
                     <th colspan="2">Produit</th>
                     {{-- <th>Catégorie</th> --}}
                     <th class="text-end">Prix Unitaire</th>
+                    <th class="text-end">Prix de Vente</th>
                     <th class="text-center">Stock Actuel</th>
                     <th class="text-center">Seuil Alerte</th>
                     <th>Statut</th>
@@ -85,7 +86,8 @@
                             {{ $produit->categorie->nom_categorie ?? '—' }}
                         </span>
                     </td> --}}
-                    <td class="text-end money">{{ number_format($produit->prix_unitaire, 2) }} MAD</td>
+                    <td class="text-end money">{{ number_format($produit->prix_unitaire,0) }} MAD</td>
+                    <td class="text-end money">{{ number_format($produit->prix_vente   ,0) }} MAD</td>
                     <td class="text-center">
                         <span class="fw-bold" style="font-size:15px;">{{ $produit->quantite_stock }}</span>
                     </td>

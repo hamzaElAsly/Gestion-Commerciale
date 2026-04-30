@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id('id_historique');
             $table->foreignId('id_client')->constrained('clients', 'id_client')->onDelete('cascade');
             $table->timestamp('date_service')->useCurrent();
+            $table->decimal('charges', 10, 2)->default(0);
             $table->decimal('montant_total', 10, 2)->default(0);
             $table->text('remarque')->nullable();
             $table->enum('statut', ['en_cours', 'termine', 'annule'])->default('termine');

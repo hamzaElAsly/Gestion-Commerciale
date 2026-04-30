@@ -15,6 +15,7 @@ class Historique extends Model
     protected $fillable = [
         'id_client',
         'date_service',
+        'charges',
         'montant_total',
         'remarque',
         'statut',
@@ -23,6 +24,7 @@ class Historique extends Model
     protected $casts = [
         'date_service' => 'datetime',
         'montant_total' => 'decimal:2',
+        'charges' => 'decimal:2',
     ];
 
     public function client()

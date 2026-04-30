@@ -93,13 +93,13 @@ class HistoriqueController extends Controller
             // Créer les détails et décrémenter le stock
             foreach ($validated['produits'] as $item) {
                 $produit = Produit::findOrFail($item['id_produit']);
-                $prixTotal = $produit->prix_unitaire * $item['quantite'];
+                $prixTotal = $produit->prix_vente * $item['quantite'];
 
                 DetailHistorique::create([
                     'id_historique' => $historique->id_historique,
                     'id_produit' => $produit->id_produit,
                     'quantite_utilisee' => $item['quantite'],
-                    'prix_unitaire' => $produit->prix_unitaire,
+                    'prix_vente' => $produit->prix_vente,
                     'prix_total' => $prixTotal,
                 ]);
 
@@ -132,7 +132,7 @@ class HistoriqueController extends Controller
     public function show(Historique $historique)
     {
         $historique->load(['client', 'details.produit.categorie', 'mouvementsStock.produit']);
-
+        $historique->loadSum('details', 'prix_total');
         return view('historique.show', compact('historique'));
     }
 
@@ -232,7 +232,7 @@ class HistoriqueController extends Controller
         return response()->json([
             'id_produit' => $produit->id_produit,
             'nom_produit' => $produit->nom_produit,
-            'prix_unitaire' => $produit->prix_unitaire,
+            'prix_vente' => $produit->prix_vente,
             'quantite_stock' => $produit->quantite_stock,
             'statut_stock' => $produit->statut_stock,
         ]);

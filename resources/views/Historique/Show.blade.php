@@ -87,7 +87,7 @@
                             <th colspan="2">Produit</th>
                             {{-- <th>Catégorie</th> --}}
                             <th class="text-center">Quantité</th>
-                            <th class="text-end">Prix Unitaire</th>
+                            <th class="text-end">Prix Vente</th>
                             <th class="text-end">Total</th>
                         </tr>
                     </thead>
@@ -101,8 +101,9 @@
                                 </span>
                             </td> --}}
                             <td class="text-center">{{ $detail->quantite_utilisee }}</td>
-                            <td class="text-end money">{{ number_format($detail->prix_unitaire, 2) }}</td>
-                            <td class="text-end money fw-semibold">{{ number_format($detail->prix_total, 2) }}</td>
+                            <td class="text-end money">{{ number_format($detail->prix_vente, 2) }}</td>
+                            {{-- <td class="text-end money fw-semibold">{{ number_format($detail->prix_total, 2) }}</td> --}}
+                            <td class="text-end money fw-semibold">{{ number_format($detail->quantite_utilisee * $detail->prix_vente, 2) }}</td>
                         </tr>
                         @endforeach
                     </tbody>
