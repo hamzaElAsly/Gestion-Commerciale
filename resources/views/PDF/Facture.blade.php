@@ -214,24 +214,12 @@
         <div style="display: table-cell; width: 50%; vertical-align: top;">
             <div class="info-label">Facturé à</div>
             <div class="info-value">{{ $historique->client->nom }}</div>
-            @if($historique->client->telephone)
-                <div class="info-sub">📞 {{ $historique->client->telephone }}</div>
-            @endif
-            @if($historique->client->adresse)
-                <div class="info-sub">📍 {{ $historique->client->adresse }}</div>
-            @endif
         </div>
         <div style="display: table-cell; width: 50%; vertical-align: top; padding-left: 30px;">
             <div class="info-label">Détails de la facture</div>
             <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">
                 N° ICE : <strong style="color: #0f172a;">{{ str_pad($historique->client->ICE, 10, '0', STR_PAD_LEFT) }}</strong>
             </div>
-            {{-- <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">
-                Date service : <strong style="color: #0f172a;">{{ $historique->date_service->format('d/m/Y') }}</strong>
-            </div>
-            <div style="font-size: 12px; color: #64748b;">
-                Imprimé le : <strong style="color: #0f172a;">{{ now()->format('d/m/Y à H:i') }}</strong>
-            </div> --}}
         </div>
     </div>
 
@@ -278,15 +266,21 @@
             <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
                 <div style="display: table; width: 100%; padding: 6px 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 6px;">
                     <div style="display: table-cell; color: #64748b; font-size: 12px;">Sous-total :</div>
-                    <div style="display: table-cell; text-align: right; font-size: 12px; font-weight: bold; font-family: monospace;">{{ number_format($historique->montant_total, 2) }} MAD</div>
+                    <div style="display: table-cell; text-align: right; font-size: 12px; font-weight: bold; font-family: monospace;">
+                        {{ number_format($historique->montant_total, 2) }} MAD
+                    </div>
                 </div>
                 <div style="display: table; width: 100%; padding: 6px 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 6px;">
-                    <div style="display: table-cell; color: #64748b; font-size: 12px;">TVA (0%) :</div>
-                    <div style="display: table-cell; text-align: right; font-size: 12px; font-family: monospace;">0.00 MAD</div>
+                    <div style="display: table-cell; color: #64748b; font-size: 12px;">TVA (20%) :</div>
+                    <div style="display: table-cell; text-align: right; font-size: 12px; font-family: monospace;">
+                        {{ number_format($historique->montant_total * 0.2, 2) }} MAD
+                    </div>
                 </div>
                 <div style="background: #1a56db; color: white; padding: 12px; border-radius: 6px; display: table; width: 100%; margin-top: 8px;">
                     <div style="display: table-cell; font-size: 13px; font-weight: bold;">TOTAL À PAYER</div>
-                    <div style="display: table-cell; text-align: right; font-size: 18px; font-weight: bold; font-family: monospace;">{{ number_format($historique->montant_total, 2) }} MAD</div>
+                    <div style="display: table-cell; text-align: right; font-size: 18px; font-weight: bold; font-family: monospace;">
+                        {{ number_format($historique->montant_total * 1.2, 2) }} MAD
+                    </div>
                 </div>
             </div>
         </div>
