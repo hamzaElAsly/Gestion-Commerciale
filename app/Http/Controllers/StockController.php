@@ -51,7 +51,7 @@ class StockController extends Controller
             'stock_normal' => $produits->where('statut_stock', 'normal')->count(),
             'stock_faible' => $produits->where('statut_stock', 'faible')->count(),
             'stock_rupture' => $produits->where('statut_stock', 'rupture')->count(),
-            'valeur_totale' => $produits->sum(fn($p) => $p->prix_unitaire * $p->quantite_stock),
+            'valeur_totale' => $produits->sum(fn($p) => $p->prix_vente * $p->quantite_stock),
         ];
 
         return view('stock.etat', compact('produits', 'stats'));
