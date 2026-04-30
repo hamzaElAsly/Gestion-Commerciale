@@ -31,30 +31,29 @@ class ClientController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nom' => 'required|nullable|string|max:100', //'digits:15','unique:clients,ICE'
-            'ICE' => 'required|string|max:50',
+            'nom'       => 'required|nullable|string|max:100', 
+            'ICE'       => 'required|string|max:50',//'digits:15','unique:clients,ICE'
             'telephone' => 'nullable|string|max:20',
-            'adresse' => 'nullable|string',
+            'adresse'   => 'nullable|string',
         ], [
             'nom.required' => 'Le nom du client est obligatoire.',
             'ICE.required' => 'L\'ICE est obligatoire.',
-            'ICE.max' => 'L\'ICE ne doit pas dépasser 50 caractères.',
-            'nom.max' => 'Le nom ne doit pas dépasser 100 caractères.',
+            'ICE.max'      => 'L\'ICE ne doit pas dépasser 50 caractères.',
+            'nom.max'      => 'Le nom ne doit pas dépasser 100 caractères.',
         ]);
         Client::create($validated);
-
         return redirect()->route('clients.index')->with('success', 'Client ajouté avec succès.');
     }
 
     public function show(Client $client)
     {
+        $topClients = Client::withCount('historiques')->withSum('historiques as total_depense', 'montant_total');
         $client->load(['historiques.details.produit']);
         $historiques = $client->historiques()
             ->with('details.produit')
             ->orderBy('date_service', 'desc')
             ->paginate(10);
-
-        return view('clients.show', compact('client', 'historiques'));
+        return view('clients.show', compact('client', 'historiques', 'topClients'));
     }
 
     public function edit(Client $client) { return view('clients.edit', compact('client')); }
@@ -62,9 +61,10 @@ class ClientController extends Controller
     public function update(Request $request, Client $client)
     {
         $validated = $request->validate([
-            'nom' => 'required|string|max:100',
+            'nom'       => 'required|string|max:100',
+            'ICE'       => 'required|string|max:50',
             'telephone' => 'nullable|string|max:20',
-            'adresse' => 'nullable|string',
+            'adresse'   => 'nullable|string',
         ]);
         $client->update($validated);
 

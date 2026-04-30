@@ -37,6 +37,9 @@
                 @if($client->adresse)
                     <p class="text-muted mb-0"><i class="bi bi-geo-alt me-1"></i>{{ $client->adresse }}</p>
                 @endif
+                @if($client->ICE)
+                    <p class="text-muted mb-0"><i class="bi bi-memo-alt me-1"></i>{{ $client->ICE }}</p>
+                @endif
             </div>
         </div>
 
@@ -44,15 +47,17 @@
             <div class="col-6">
                 <div class="stat-card">
                     <div>
-                        <div class="stat-value">{{ $client->historiques_count }} 0</div>
+                        <div class="stat-value">
+                            {{ $topClients->where('id_client', $client->id_client)->first()->historiques_count ?? 0 }}
+                        </div>
                         <div class="stat-label">Services</div>
                     </div>
                 </div>
-            </div>
+            </div>  
             <div class="col-6">
                 <div class="stat-card">
                     <div>
-                        <div class="stat-value" style="font-size:18px;">{{ number_format($client->total_depense ?? 0, 0) }}</div>
+                        <div class="stat-value" style="font-size:18px;">{{ number_format($historiques->sum('montant_total'), 2) }}</div>
                         <div class="stat-label">Total MAD</div>
                     </div>
                 </div>
