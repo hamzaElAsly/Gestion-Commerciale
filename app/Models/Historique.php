@@ -50,8 +50,7 @@ class Historique extends Model
 
     public function scopeParMois($query, int $mois, int $annee)
     {
-        return $query->whereMonth('date_service', $mois)
-                     ->whereYear('date_service', $annee);
+        return $query->whereMonth('date_service', $mois)->whereYear('date_service', $annee);
     }
 
     public function scopeParPeriode($query, $dateDebut, $dateFin)

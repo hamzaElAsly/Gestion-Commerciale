@@ -39,6 +39,11 @@ class Produit extends Model
         return $this->hasMany(DetailHistorique::class, 'id_produit', 'id_produit');
     }
 
+    public function detailDevis()
+    {
+        return $this->hasMany(DetailDevis::class, 'id_produit', 'id_produit');
+    }
+
     public function mouvementsStock()
     {
         return $this->hasMany(GestionStock::class, 'id_produit', 'id_produit');

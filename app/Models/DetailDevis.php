@@ -5,16 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class DetailHistorique extends Model
+class DetailDevis extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'id_detail';
-
     protected $fillable = [
-        'id_historique',
+        'id_devis',
         'id_produit',
-        'quantite_utilisee',
+        'quantite',
         'prix_vente',
         'prix_total',
     ];
@@ -23,15 +21,15 @@ class DetailHistorique extends Model
         'prix_vente' => 'decimal:2',
         'prix_total' => 'decimal:2',
     ];
-
-    public function historique()
+    
+    public function Devis()
     {
-        return $this->belongsTo(Historique::class, 'id_historique', 'id_historique');
+        return $this->belongsTo(Devis::class, 'id_devis', 'id_devis');
     }
 
-    public function produit()
+    public function produit() 
     {
-        return $this->belongsTo(Produit::class, 'id_produit', 'id_produit');
+        return $this->belongsTo(Produit::class, 'id_produit');
     }
 
     protected static function boot()
@@ -39,7 +37,7 @@ class DetailHistorique extends Model
         parent::boot();
 
         static::saving(function ($detail) {
-            $detail->prix_total = $detail->quantite_utilisee * $detail->prix_vente;
+            $detail->prix_total = $detail->quantite * $detail->prix_vente;
         });
     }
 }

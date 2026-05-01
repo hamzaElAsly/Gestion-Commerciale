@@ -7,6 +7,7 @@ use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\ProduitController;
 use App\Http\Controllers\HistoriqueController;
 use App\Http\Controllers\StockController;
+use App\Http\Controllers\DevisController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,6 +43,10 @@ Route::get('/', function () {
         ->name('historique.facture');
     Route::get('/api/produits/{produit}/info', [HistoriqueController::class, 'getProduitInfo'])
         ->name('api.produit.info');
+
+    // Devis
+    Route::resource('devis', DevisController::class);
+    Route::get('devis/{id}/print', [DevisController::class, 'print'])->name('devis.print');
 
     // Gestion du stock
     Route::get('/stock', [StockController::class, 'index'])->name('stock.index');
