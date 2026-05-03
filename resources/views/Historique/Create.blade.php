@@ -87,6 +87,14 @@
         </div>
     </div>
 
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <span><i class="bi bi-box-seam-fill me-2 text-primary"></i>Frais de Service (MAD)</span>
+                <input type="number" class="form-control form-control-sm w-auto" name="charges" id="search-produit" placeholder="Rechercher un produit...">
+            </div>
+        </div>
+    </div>
     <!-- ===== PRODUITS UTILISÉS ===== -->
     <div class="col-lg-7">
         <div class="card">

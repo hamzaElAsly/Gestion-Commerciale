@@ -504,7 +504,10 @@
             {{-- <a href="{{ route('categories.index') }}" class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}">
                 <i class="bi bi-tags-fill"></i> Catégories
             </a> --}}
-
+            <a href="{{ route('devis.index') }}" class="nav-link {{ request()->routeIs('devis.*') ? 'active' : '' }}">
+                <i class="bi bi-box-seam-fill"></i> Devis
+            </a>
+            
             <a href="{{ route('produits.index') }}" class="nav-link {{ request()->routeIs('produits.*') ? 'active' : '' }}">
                 <i class="bi bi-box-seam-fill"></i> Produits
             </a>

@@ -89,7 +89,6 @@ class DevisController extends Controller
     {
         $devis = Devis::with('details')->findOrFail($id);
         $produits = Produit::all();
-
         return view('devis.edit', compact('devis', 'produits'));
     }
 
@@ -157,10 +156,7 @@ class DevisController extends Controller
     public function print($id)
     {
         $devis = Devis::with('details.produit')->findOrFail($id);
-
-        $pdf = Pdf::loadView('pdf.devis', compact('devis'))
-            ->setPaper('a4', 'portrait');
-
+        $pdf = Pdf::loadView('pdf.devis', compact('devis'))->setPaper('a4', 'portrait');
         return $pdf->download("devis-{$devis->id_devis}.pdf");
     }
 }

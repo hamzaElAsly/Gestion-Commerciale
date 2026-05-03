@@ -59,6 +59,7 @@ class HistoriqueController extends Controller
             'remarque' => 'nullable|string',
             'statut' => 'required|in:en_cours,termine,annule',
             'produits' => 'required|array|min:1',
+            'charges' => 'required|numeric|min:0',
             'produits.*.id_produit' => 'required|exists:produits,id_produit',
             'produits.*.quantite' => 'required|integer|min:1',
         ], [
@@ -66,6 +67,9 @@ class HistoriqueController extends Controller
             'date_service.required' => 'La date du service est obligatoire.',
             'produits.required' => 'Veuillez ajouter au moins un produit.',
             'produits.min' => 'Veuillez ajouter au moins un produit.',
+            'charges.required' => 'Les frais de service sont obligatoires.',
+            'charges.numeric' => 'Les frais de service doivent être un nombre valide.',
+            'charges.min' => 'Les frais de service doivent être un nombre positif.',
         ]);
 
         DB::beginTransaction();
@@ -83,6 +87,7 @@ class HistoriqueController extends Controller
             $historique = Historique::create([
                 'id_client' => $validated['id_client'],
                 'date_service' => $validated['date_service'],
+                'charges' => $validated['charges'],
                 'remarque' => $validated['remarque'] ?? null,
                 'statut' => $validated['statut'],
                 'montant_total' => 0,
@@ -93,8 +98,8 @@ class HistoriqueController extends Controller
             // Créer les détails et décrémenter le stock
             foreach ($validated['produits'] as $item) {
                 $produit = Produit::findOrFail($item['id_produit']);
-                $prixTotal = $produit->prix_vente * $item['quantite'];
-
+                $prixTotal = ($produit->prix_vente * $item['quantite']) + $validated['charges'];
+                // dd($produit->prix_vente, $validated['charges'], $prixTotal);
                 DetailHistorique::create([
                     'id_historique' => $historique->id_historique,
                     'id_produit' => $produit->id_produit,

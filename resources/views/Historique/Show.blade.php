@@ -79,7 +79,8 @@
     <div class="col-lg-8">
         <!-- Produits utilisés -->
         <div class="card mb-4">
-            <div class="card-header"><i class="bi bi-box-seam me-2 text-primary"></i>Produits Utilisés</div>
+            <div class="card-header float-left"><i class="bi bi-box-seam me-2 text-primary"></i>Produits Utilisés</div>
+            <div class="card-header float-right"><i class="bi bi-box-seam me-2 text-primary"></i>Frais de Service : {{$historique->charges}}</div>
             <div class="table-responsive">
                 <table class="table mb-0">
                     <thead>

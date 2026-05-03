@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>Facture #{{ $historique->id_historique }}</title>
+    <title>DEVIS #{{ $devis->id_devis }}</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -196,30 +196,20 @@
             <div class="company-sub">📞 +212 622-390028</div>
         </div>
         <div class="header-right">
-            <div class="invoice-title">FACTURE</div>
-            <div class="invoice-number">#{{ str_pad($historique->id_historique, 6, '0', STR_PAD_LEFT) }}</div>
+            <div class="invoice-title">DEVIS</div>
+            <div class="invoice-number">#{{ str_pad($devis->id_devis, 6, '0', STR_PAD_LEFT) }}</div>
             <div style="margin-top: 8px; font-size: 12px; color: #64748b;">
-                Date : {{ $historique->date_service->format('d/m/Y') }} {{--  à H:i --}}
+                Date : {{ $devis->updated_at->format('d/m/Y') }} {{--  à H:i --}}
             </div>
-            <div style="margin-top: 6px;">
-                <span class="status-badge status-{{ $historique->statut }}">
-                    {{ $historique->statut_label }}
-                </span>
-            </div>
+            
         </div>
     </div>
 
     <!-- Informations client / service -->
     <div style="display: table; width: 100%; margin-bottom: 30px;">
         <div style="display: table-cell; width: 50%; vertical-align: top;">
-            <div class="info-label">Facturé à</div>
-            <div class="info-value">{{ $historique->client->nom }}</div>
-        </div>
-        <div style="display: table-cell; width: 50%; vertical-align: top; padding-left: 30px;">
-            <div class="info-label">Détails de la facture</div>
-            <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">
-                N° ICE : <strong style="color: #0f172a;">{{ str_pad($historique->client->ICE, 10, '0', STR_PAD_LEFT) }}</strong>
-            </div>
+            <div class="info-label">Devis à</div>
+            <div class="info-value">{{ $devis->nom_client }}</div>
         </div>
     </div>
 
@@ -239,16 +229,12 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td colspan="2">Frais de Service</td>
-                <td colspan="3" style="text-align: center; font-weight: bold;">{{ number_format($historique->charges, 2) }} MAD</td>
-            </tr>
-            @foreach($historique->details as $idx => $detail)
+            @foreach($devis->details as $idx => $detail)
             <tr>
                 <td style="color: #94a3b8;">{{ $idx + 1 }}</td>
                 <td style="font-weight: 600;">{{ $detail->produit->nom_produit ?? 'N/A' }}</td>
                 {{-- <td style="color: #64748b;">{{ $detail->produit->categorie->nom_categorie ?? '—' }}</td> --}}
-                <td style="text-align: center; font-weight: bold;">{{ $detail->quantite_utilisee }}</td>
+                <td style="text-align: center; font-weight: bold;">{{ $detail->quantite }}</td>
                 <td style="text-align: right; font-family: monospace;">{{ number_format($detail->prix_vente, 2) }} MAD</td>
                 <td style="text-align: right; font-family: monospace; font-weight: bold;">{{ number_format($detail->prix_total, 2) }} MAD</td>
             </tr>
@@ -258,20 +244,12 @@
 
     <!-- Total -->
     <div style="display: table; width: 100%;">
-        <div style="display: table-cell; width: 55%; vertical-align: top;">
-            @if($historique->remarque)
-            <div class="remarks">
-                <div class="remarks-title">💬 Remarque :</div>
-                {{ $historique->remarque }}
-            </div>
-            @endif
-        </div>
         <div style="display: table-cell; width: 45%; vertical-align: top; padding-left: 20px;">
             <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
-                <div style="display: table; width: 100%; padding: 6px 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 6px;">
+                {{-- <div style="display: table; width: 100%; padding: 6px 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 6px;">
                     <div style="display: table-cell; color: #64748b; font-size: 12px;">Sous-total :</div>
                     <div style="display: table-cell; text-align: right; font-size: 12px; font-weight: bold; font-family: monospace;">
-                        {{ number_format($historique->montant_total, 2) }} MAD
+                        {{ number_format($devis->montant_total, 2) }} MAD
                     </div>
                 </div>
                 <div style="display: table; width: 100%; padding: 6px 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 6px;">
@@ -279,11 +257,11 @@
                     <div style="display: table-cell; text-align: right; font-size: 12px; font-family: monospace;">
                         {{ number_format($historique->montant_total * 0.2, 2) }} MAD
                     </div>
-                </div>
+                </div> --}}
                 <div style="background: #1a56db; color: white; padding: 12px; border-radius: 6px; display: table; width: 100%; margin-top: 8px;">
                     <div style="display: table-cell; font-size: 13px; font-weight: bold;">TOTAL À PAYER</div>
                     <div style="display: table-cell; text-align: right; font-size: 18px; font-weight: bold; font-family: monospace;">
-                        {{ number_format($historique->montant_total * 1.2, 2) }} MAD
+                        {{ number_format($devis->montant_total, 2) }} MAD
                     </div>
                 </div>
             </div>

@@ -107,55 +107,86 @@
     </div>
 
     <!-- Tableau récapitulatif -->
-    <table>
-        <thead>
-            <tr>
-                <th style="width:5%">#</th>
-                <th style="width:18%">Client</th>
-                <th style="width:10%">Date</th>
-                <th style="width:35%">Produits utilisés</th>
-                <th style="width:15%">Remarque</th>
-                <th style="width:12%;text-align:right">Montant</th>
-                <th style="width:5%;text-align:center">Statut</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($historiques as $h)
-            <tr>
-                <td class="muted">#{{ $h->id_historique }}</td>
-                <td style="font-weight:600;">{{ $h->client->nom ?? 'N/A' }}</td>
-                <td class="muted">{{ $h->date_service->format('d/m/Y') }}</td>
-                <td>
-                    @foreach($h->details as $d)
-                        <span style="font-size:10px; background:#f1f5f9; padding:2px 6px; border-radius:3px; margin-right:3px; margin-bottom:2px; display:inline-block;">
-                            {{ $d->produit->nom_produit ?? '?' }} ×{{ $d->quantite_utilisee }}
-                        </span>
-                    @endforeach
-                </td>
-                <td class="muted" style="font-size:10px;">{{ $h->remarque ? \Illuminate\Support\Str::limit($h->remarque, 40) : '—' }}</td>
-                <td class="text-right money" style="color:#1a56db;">{{ number_format($h->montant_total, 2) }}</td>
-                <td class="text-center" style="font-size:9px;font-weight:bold;color:{{ $h->statut === 'termine' ? '#059669' : ($h->statut === 'annule' ? '#dc2626' : '#d97706') }}">
-                    {{ $h->statut_label }}
-                </td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="7" style="text-align:center;padding:20px;color:#64748b;">
-                    Aucun service pour ce mois.
-                </td>
-            </tr>
-            @endforelse
-        </tbody>
-        @if($historiques->count() > 0)
-        <tfoot>
-            <tr>
-                <td colspan="5" class="text-right">TOTAL {{ strtoupper($nomMois) }} {{ $annee }} :</td>
-                <td class="text-right money" style="color:#1a56db;font-size:14px;">{{ number_format($totalMois, 2) }} MAD</td>
-                <td></td>
-            </tr>
-        </tfoot>
-        @endif
-    </table>
+<table>
+    <thead>
+        <tr>
+            <th style="width:5%">#</th>
+            <th style="width:18%">Client</th>
+            <th style="width:10%">Date</th>
+            <th style="width:35%">Produits utilisés</th>
+            <th style="width:15%">Remarque</th>
+            <th style="width:10%">Frais service</th>
+            <th style="width:12%;text-align:right">Montant</th>
+            <th style="width:5%;text-align:center">Statut</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @forelse($historiques as $h)
+        <tr>
+            <td class="muted">#{{ $h->id_historique }}</td>
+
+            <td style="font-weight:600;">
+                {{ $h->client->nom ?? 'N/A' }}
+            </td>
+
+            <td class="muted">
+                {{ $h->date_service->format('d/m/Y') }}
+            </td>
+
+            <!-- ✅ PRODUITS -->
+            <td>
+                @foreach($h->details as $d)
+                    <span style="font-size:10px; background:#f1f5f9; padding:2px 6px; border-radius:3px; margin-right:3px; margin-bottom:2px; display:inline-block;">
+                        {{ $d->produit->nom_produit ?? '?' }} ×{{ $d->quantite_utilisee }}
+                    </span>
+                @endforeach
+            </td>
+
+            <!-- ✅ REMARQUE -->
+            <td class="muted" style="font-size:10px;">
+                {{ $h->remarque ? \Illuminate\Support\Str::limit($h->remarque, 40) : '—' }}
+            </td>
+
+            <!-- ✅ CHARGES -->
+            <td class="muted text-right">
+                {{ number_format($h->charges, 2) }} MAD
+            </td>
+
+            <!-- ✅ MONTANT -->
+            <td class="text-right money" style="color:#1a56db;">
+                {{ number_format($h->montant_total, 2) }} MAD
+            </td>
+
+            <!-- ✅ STATUT -->
+            <td class="text-center" style="font-size:9px;font-weight:bold;color:
+                {{ $h->statut === 'termine' ? '#059669' : ($h->statut === 'annule' ? '#dc2626' : '#d97706') }}">
+                {{ $h->statut_label }}
+            </td>
+        </tr>
+        @empty
+        <tr>
+            <td colspan="8" style="text-align:center;padding:20px;color:#64748b;">
+                Aucun service pour ce mois.
+            </td>
+        </tr>
+        @endforelse
+    </tbody>
+
+    @if($historiques->count() > 0)
+    <tfoot>
+        <tr>
+            <td colspan="6" class="text-right">
+                TOTAL {{ strtoupper($nomMois) }} {{ $annee }} :
+            </td>
+            <td class="text-right money" style="color:#1a56db;font-size:14px;">
+                {{ number_format($totalMois, 2) }} MAD
+            </td>
+            <td></td>
+        </tr>
+    </tfoot>
+    @endif
+</table>
 
     <!-- Récapitulatif par client -->
     @if($historiques->count() > 0)

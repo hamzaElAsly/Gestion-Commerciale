@@ -5,11 +5,11 @@
 @section('content')
 <div class="page-header">
     <div>
-        <h1>Modifier le Produit</h1>
+        <h1>Modifier le Devis</h1>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item"><a href="{{ route('produits.index') }}" class="text-muted">Produits</a></li>
-                <li class="breadcrumb-item active text-muted">{{ $produit->nom_produit }}</li>
+                <li class="breadcrumb-item"><a href="{{ route('devis.index') }}" class="text-muted">Devis</a></li>
+                <li class="breadcrumb-item active text-muted">{{ $devis->id_devis }}</li>
             </ol>
         </nav>
     </div>
@@ -19,73 +19,137 @@
     <div class="col-lg-7">
         <div class="card">
             <div class="card-header">
-                <i class="bi bi-pencil-square me-2 text-primary"></i> Modifier : {{ $produit->nom_produit }}
+                <i class="bi bi-pencil-square me-2 text-primary"></i> Modifier : {{ $devis->nom_client }}
             </div>
             <div class="card-body">
-                <form method="POST" action="{{ route('produits.update', $produit) }}">
-                    @csrf @method('PUT')
+                <form method="POST" action="{{ route('devis.update', $devis->id_devis) }}">
+                    @csrf
+                    @method('PUT')
 
+                    <!-- Client -->
                     <div class="mb-3">
-                        <label class="form-label">Nom du produit <span class="text-danger">*</span></label>
-                        <input type="text" name="nom_produit" class="form-control @error('nom_produit') is-invalid @enderror"
-                               value="{{ old('nom_produit', $produit->nom_produit) }}" required>
-                        @error('nom_produit')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        <label>Nom Client</label>
+                        <input type="text" name="nom_client" class="form-control"
+                            value="{{ $devis->nom_client }}" required>
                     </div>
 
-                    {{-- <div class="mb-3">
-                        <label class="form-label">Catégorie <span class="text-danger">*</span></label>
-                        <select name="id_categorie" class="form-select @error('id_categorie') is-invalid @enderror" required>
-                            <option value="">— Sélectionner —</option>
-                            @foreach($categories as $cat)
-                                <option value="{{ $cat->id_categorie }}"
-                                    {{ old('id_categorie', $produit->id_categorie) == $cat->id_categorie ? 'selected' : '' }}>
-                                    {{ $cat->nom_categorie }}
-                                </option>
+                    <!-- Table -->
+                    <table class="table" id="produits-table">
+                        <thead>
+                            <tr>
+                                <th>Produit</th>
+                                <th>Prix</th>
+                                <th>Quantité</th>
+                                <th>Total</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($devis->details as $i => $detail)
+                            <tr>
+                                <td>
+                                    <select name="produits[{{ $i }}][id_produit]" class="form-control" onchange="updatePrice(this)">
+                                        @foreach($produits as $p)
+                                        <option value="{{ $p->id_produit }}"
+                                            data-price="{{ $p->prix_vente }}"
+                                            {{ $p->id_produit == $detail->id_produit ? 'selected' : '' }}>
+                                            {{ $p->nom_produit }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                </td>
+
+                                <td>
+                                    <input type="text" class="form-control prix" value="{{ $detail->prix_vente }}" readonly>
+                                </td>
+
+                                <td>
+                                    <input type="number" name="produits[{{ $i }}][quantite]"
+                                        class="form-control quantite"
+                                        value="{{ $detail->quantite }}"
+                                        min="1" oninput="calculateRow(this)">
+                                </td>
+
+                                <td>
+                                    <input type="text" class="form-control total"
+                                        value="{{ $detail->prix_total }}" readonly>
+                                </td>
+
+                                <td>
+                                    <button type="button" class="btn btn-danger" onclick="removeRow(this)">X</button>
+                                </td>
+                            </tr>
                             @endforeach
-                        </select>
-                        @error('id_categorie')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                    </div> --}}
+                        </tbody>
+                    </table>
 
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Prix unitaire (MAD) <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <input type="number" name="prix_unitaire" step="0.01" min="0"
-                                       class="form-control @error('prix_unitaire') is-invalid @enderror"
-                                       value="{{ old('prix_unitaire', $produit->prix_unitaire) }}" required>
-                                <span class="input-group-text">MAD</span>
-                            </div>
-                            @error('prix_unitaire')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Quantité en stock</label>
-                            <input type="number" name="quantite_stock" min="0"
-                                   class="form-control @error('quantite_stock') is-invalid @enderror"
-                                   value="{{ old('quantite_stock', $produit->quantite_stock) }}" required>
-                            <div class="form-text text-warning">⚠ Modification enregistrée comme ajustement</div>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Seuil d'alerte</label>
-                            <input type="number" name="seuil_alerte" min="0"
-                                   class="form-control @error('seuil_alerte') is-invalid @enderror"
-                                   value="{{ old('seuil_alerte', $produit->seuil_alerte) }}" required>
-                        </div>
-                    </div>
+                    <button type="button" class="btn btn-primary" onclick="addRow()">+ Ajouter</button>
 
-                    <div class="mb-4">
-                        <label class="form-label">Description</label>
-                        <textarea name="description" class="form-control" rows="3">{{ old('description', $produit->description) }}</textarea>
-                    </div>
+                    <h4 class="mt-3">Total: <span id="grand-total">0</span> MAD</h4>
 
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-check-lg me-1"></i> Mettre à jour
-                        </button>
-                        <a href="{{ route('produits.index') }}" class="btn btn-light">Annuler</a>
-                    </div>
+                    <button class="btn btn-success mt-3">Modifier</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    let index = {{ count($devis->details) }};
+    const produits = @json($produits);
+
+    function addRow() {
+        let row = `
+        <tr>
+            <td>
+                <select name="produits[${index}][id_produit]" class="form-control" onchange="updatePrice(this)">
+                    ${produits.map(p => `<option value="${p.id_produit}" data-price="${p.prix_vente}">${p.nom_produit}</option>`).join('')}
+                </select>
+            </td>
+            <td><input type="text" class="form-control prix" readonly></td>
+            <td><input type="number" name="produits[${index}][quantite]" class="form-control quantite" value="1" min="1" oninput="calculateRow(this)"></td>
+            <td><input type="text" class="form-control total" readonly></td>
+            <td><button type="button" class="btn btn-danger" onclick="removeRow(this)">X</button></td>
+        </tr>
+        `;
+
+        document.querySelector('#produits-table tbody').insertAdjacentHTML('beforeend', row);
+        index++;
+    }
+
+    function removeRow(btn) {
+        btn.closest('tr').remove();
+        calculateTotal();
+    }
+
+    function updatePrice(select) {
+        let price = select.selectedOptions[0].dataset.price || 0;
+        let row = select.closest('tr');
+
+        row.querySelector('.prix').value = price;
+        calculateRow(select);
+    }
+
+    function calculateRow(el) {
+        let row = el.closest('tr');
+
+        let price = parseFloat(row.querySelector('.prix').value) || 0;
+        let qty = parseInt(row.querySelector('.quantite').value) || 0;
+
+        row.querySelector('.total').value = (price * qty).toFixed(2);
+
+        calculateTotal();
+    }
+
+    function calculateTotal() {
+        let total = 0;
+        document.querySelectorAll('.total').forEach(el => {
+            total += parseFloat(el.value) || 0;
+        });
+        document.getElementById('grand-total').innerText = total.toFixed(2);
+    }
+
+    // 🔥 init total au chargement
+    document.addEventListener('DOMContentLoaded', calculateTotal);
+</script>
 @endsection
