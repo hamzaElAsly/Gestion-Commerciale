@@ -15,7 +15,7 @@
     </div>
 </div>
 
-<form method="POST" action="{{ route('historique.store') }}" id="service-form">
+<form method="POST" action="{{ route('historique.store') }}" id="service-form" onsubmit="nettoyerProduitsAvantSubmit()">
 @csrf
 
 <div class="row g-4">
@@ -131,7 +131,7 @@
         <div class="row g-2">
             <div class="col-md-6">
                 <label class="form-label">Produit</label>
-                <select name="produits[__INDEX__][id_produit]" class="form-select produit-select" required onchange="onProduitChange(this)">
+                <select name="produits[__INDEX__][id_produit]" class="form-select produit-select" onchange="onProduitChange(this)">
                     <option value="">— Choisir —</option>
                     @foreach($produits as $p)
                         <option value="{{ $p->id_produit }}"
@@ -146,7 +146,7 @@
             <div class="col-md-3">
                 <label class="form-label">Quantité</label>
                 <input type="number" name="produits[__INDEX__][quantite]" class="form-control produit-qte"
-                       min="1" value="1" required onchange="calculerLigne(this)">
+                       min="1" value="1" onchange="calculerLigne(this)">
                 <div class="stock-info mt-1" style="font-size:11.5px;"></div>
             </div>
             <div class="col-md-3">
@@ -161,6 +161,19 @@
 @push('scripts')
 <script>
 let compteur = 0;
+
+function nettoyerProduitsAvantSubmit() {
+    const rows = document.querySelectorAll('.produit-row');
+
+    rows.forEach(row => {
+        const select = row.querySelector('.produit-select');
+
+        // إلا ما تختارش produit → نحيد row
+        if (!select.value) {
+            row.remove();
+        }
+    });
+}
 
 function ajouterProduit() {
     const template = document.getElementById('produit-template').innerHTML;
