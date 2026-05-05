@@ -32,20 +32,6 @@
                         @error('nom_produit')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
-                    {{-- <div class="mb-3">
-                        <label class="form-label">Catégorie <span class="text-danger">*</span></label>
-                        <select name="id_categorie" class="form-select @error('id_categorie') is-invalid @enderror" required>
-                            <option value="">— Sélectionner —</option>
-                            @foreach($categories as $cat)
-                                <option value="{{ $cat->id_categorie }}"
-                                    {{ old('id_categorie', $produit->id_categorie) == $cat->id_categorie ? 'selected' : '' }}>
-                                    {{ $cat->nom_categorie }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('id_categorie')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                    </div> --}}
-
                     <div class="row g-3 mb-3">
                         <div class="col-md-4">
                             <label class="form-label">Prix unitaire (MAD) <span class="text-danger">*</span></label>
@@ -58,11 +44,20 @@
                             @error('prix_unitaire')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                         <div class="col-md-4">
+                            <label class="form-label">Prix Vente (MAD) <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="number" name="prix_vente" step="0.01" min="0"
+                                       class="form-control @error('prix_vente') is-invalid @enderror"
+                                       value="{{ old('prix_vente', $produit->prix_vente) }}" required>
+                                <span class="input-group-text">MAD</span>
+                            </div>
+                            @error('prix_vente')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-4">
                             <label class="form-label">Quantité en stock</label>
                             <input type="number" name="quantite_stock" min="0"
                                    class="form-control @error('quantite_stock') is-invalid @enderror"
                                    value="{{ old('quantite_stock', $produit->quantite_stock) }}" required>
-                            <div class="form-text text-warning">⚠ Modification enregistrée comme ajustement</div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Seuil d'alerte</label>

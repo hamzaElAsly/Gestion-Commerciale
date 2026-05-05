@@ -110,21 +110,27 @@
 <table>
     <thead>
         <tr>
-            <th style="width:5%">#</th>
-            <th style="width:18%">Client</th>
+            {{-- <th style="width:5%">#</th> --}}
+            {{-- <th style="width:18%">Client</th>
             <th style="width:10%">Date</th>
             <th style="width:35%">Produits utilisés</th>
             <th style="width:15%">Remarque</th>
             <th style="width:10%">Frais service</th>
-            <th style="width:12%;text-align:right">Montant</th>
-            <th style="width:5%;text-align:center">Statut</th>
+            <th style="width:12%;text-align:right">Montant</th> --}}
+            <th>Client</th>
+            <th>Date</th>
+            <th style="width:45%">Produits utilisés</th>
+            <th>Remarque</th>
+            <th>Frais service</th>
+            <th style="text-align:right">Montant</th>
+            {{-- <th style="width:5%;text-align:center">Statut</th> --}}
         </tr>
     </thead>
 
     <tbody>
         @forelse($historiques as $h)
         <tr>
-            <td class="muted">#{{ $h->id_historique }}</td>
+            {{-- <td class="muted">#{{ $h->id_historique }}</td> --}}
 
             <td style="font-weight:600;">
                 {{ $h->client->nom ?? 'N/A' }}
@@ -138,7 +144,7 @@
             <td>
                 @foreach($h->details as $d)
                     <span style="font-size:10px; background:#f1f5f9; padding:2px 6px; border-radius:3px; margin-right:3px; margin-bottom:2px; display:inline-block;">
-                        {{ $d->produit->nom_produit ?? '?' }} ×{{ $d->quantite_utilisee }}
+                        {{ $d->produit->nom_produit ?? '?' }} ×{{ $d->quantite_utilisee }} ={{ number_format($d->prix_total, 2) }} MAD
                     </span>
                 @endforeach
             </td>
@@ -159,10 +165,10 @@
             </td>
 
             <!-- ✅ STATUT -->
-            <td class="text-center" style="font-size:9px;font-weight:bold;color:
+            {{-- <td class="text-center" style="font-size:9px;font-weight:bold;color:
                 {{ $h->statut === 'termine' ? '#059669' : ($h->statut === 'annule' ? '#dc2626' : '#d97706') }}">
                 {{ $h->statut_label }}
-            </td>
+            </td> --}}
         </tr>
         @empty
         <tr>

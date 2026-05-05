@@ -42,7 +42,6 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('dashboard')
-            ->with('success', "Bienvenue {$user->name} ! Votre compte a été créé avec succès.");
+        return redirect()->route('auth.login')->with('success', "Bienvenue {$user->name} ! Votre compte a été créé avec succès.");
     }
 }

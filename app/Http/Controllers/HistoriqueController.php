@@ -61,11 +61,10 @@ class HistoriqueController extends Controller
             'produits' => 'nullable|array',
             'produits.*.id_produit' => 'required_with:produits|exists:produits,id_produit',
             'produits.*.quantite' => 'required_with:produits|integer|min:1',
-            'charges' => 'required|numeric|min:0',
+            'charges' => 'numeric|min:0',
         ], [
             'id_client.required' => 'Veuillez sélectionner un client.',
             'date_service.required' => 'La date du service est obligatoire.',
-            'charges.required' => 'Les frais de service sont obligatoires.',
             'charges.numeric' => 'Les frais doivent être un nombre.',
             'charges.min' => 'Les frais doivent être positifs.',
         ]);
@@ -164,6 +163,7 @@ class HistoriqueController extends Controller
             'produits' => 'nullable|array',
             'produits.*.id_produit' => 'required_with:produits|exists:produits,id_produit',
             'produits.*.quantite' => 'required_with:produits|integer|min:1',
+            'charges' => 'nullable|numeric|min:0',
         ]);
 
         DB::beginTransaction();
@@ -208,7 +208,8 @@ class HistoriqueController extends Controller
             $historique->update([
                 'remarque' => $validated['remarque'] ?? null,
                 'statut' => $validated['statut'],
-                'montant_total' => $montantTotal + ($historique->charges ?? 0),
+                'charges' => $validated['charges'],
+                'montant_total' => $montantTotal + ($validated['charges'] ?? 0),
             ]);
 
             DB::commit();

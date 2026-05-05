@@ -40,6 +40,13 @@
                     <input type="text" class="form-control"
                         value="{{ $historique->date_service->format('d/m/Y H:i') }}" disabled>
                 </div>
+                @if($historique->client->ICE)
+                    <div class="mb-3">
+                        <label class="form-label">N° ICE</label>
+                        <input type="text" class="form-control"
+                            value="{{ $historique->client->ICE }}" disabled>
+                    </div>
+                @endif
 
                 <div class="mb-3">
                     <label class="form-label">Statut</label>
@@ -58,28 +65,44 @@
                 <div class="card mt-3">
                     <div class="card-body d-flex justify-content-between">
                         <strong>Total Produits:</strong>
-                        <span id="recap-total">0 MAD</span>
+                        <span id="recap-total">{{ $historique->montant_total }} MAD</span>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <div class="m-2 d-flex justify-content-around gap-2">
+                <button type="submit" class="btn btn-primary">
+                    💾 Enregistrer
+                </button>
 
+                <a href="{{ route('historique.show', $historique) }}" class="btn btn-light">
+                    Annuler
+                </a>
             </div>
         </div>
     </div>
 
     <!-- ===== PRODUITS ===== -->
     <div class="col-lg-7">
-        <div class="card">
-            <div class="card-header">
-                Produits
+        <div class="card mb-4">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <span><i class="bi bi-box-seam-fill me-2 text-primary"></i>Frais de Service (MAD)</span>
+                <input type="number" class="form-control form-control-sm w-auto" value="{{ old('charges', $historique->charges) }}"
+                name="charges" id="search-produit" placeholder="Frais de Service ...">
+                @error('charges')
+                    <div class="alert alert-danger mt-2">{{ $message }}</div>
+                @enderror
             </div>
+        </div>
+        <div class="card">
+            <div class="card-header"> Produits </div>
 
             <div class="card-body">
-
                 <!-- HEADER -->
                 <div class="row fw-bold mb-2">
                     <div class="col-md-4">Produit</div>
                     <div class="col-md-3">Qté</div>
-                    {{-- <div class="col-md-2">Prix</div> --}}
                     <div class="col-md-3">Total</div>
                     <div class="col-md-2"></div>
                 </div>
@@ -113,14 +136,6 @@
                                 min="1">
                         </div>
 
-                        {{-- <!-- Prix -->
-                        <div class="col-md-2">
-                            <input type="text"
-                                class="form-control prix-vente"
-                                value="{{ $detail->prix_vente }}"
-                                readonly>
-                        </div> --}}
-
                         <!-- Total -->
                         <div class="col-md-3">
                             <input type="text"
@@ -149,15 +164,7 @@
     </div>
 </div>
 
-<div class="mt-4 d-flex gap-2">
-    <button type="submit" class="btn btn-primary">
-        💾 Enregistrer
-    </button>
 
-    <a href="{{ route('historique.show', $historique) }}" class="btn btn-light">
-        Annuler
-    </a>
-</div>
 
 </form>
 
@@ -221,8 +228,8 @@
         document.querySelectorAll('.prix-total').forEach(input => {
             total += parseFloat(input.value || 0);
         });
-
-        document.getElementById('recap-total').textContent = total.toFixed(2) + ' MAD';
+        let montantTotal = total + parseFloat(document.querySelector('input[name="charges"]').value || 0);
+        document.getElementById('recap-total').textContent = montantTotal.toFixed(2);
     }
 
     // ================== ADD PRODUIT ==================

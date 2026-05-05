@@ -92,10 +92,12 @@
         <div class="card mb-4">
             <div class="card-header d-flex align-items-center justify-content-between">
                 <span><i class="bi bi-box-seam-fill me-2 text-primary"></i>Frais de Service (MAD)</span>
-                <input type="number" class="form-control form-control-sm w-auto" name="charges" id="search-produit" placeholder="Rechercher un produit...">
+                <input type="number" name="charges" class="form-control w-50 @error('charges') is-invalid @enderror"
+                    value="{{ old('charges', 0) }}" min="0" step="0.01">
+                @error('charges')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
         </div>
-        
+
         <div class="card">
             <div class="card-header d-flex align-items-center justify-content-between">
                 <span><i class="bi bi-box-seam-fill me-2 text-primary"></i>Produits Utilisés</span>
