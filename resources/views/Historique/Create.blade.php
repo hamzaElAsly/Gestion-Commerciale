@@ -160,108 +160,107 @@
 
 @push('scripts')
 <script>
-let compteur = 0;
+    let compteur = 0;
 
-function nettoyerProduitsAvantSubmit() {
-    const rows = document.querySelectorAll('.produit-row');
+    function nettoyerProduitsAvantSubmit() {
+        const rows = document.querySelectorAll('.produit-row');
 
-    rows.forEach(row => {
-        const select = row.querySelector('.produit-select');
-
-        // إلا ما تختارش produit → نحيد row
-        if (!select.value) {
-            row.remove();
-        }
-    });
-}
-
-function ajouterProduit() {
-    const template = document.getElementById('produit-template').innerHTML;
-    const idx = compteur++;
-    const html = template.replace(/__INDEX__/g, idx).replace(/__NUM__/g, document.querySelectorAll('.produit-row').length + 1);
-    
-    const container = document.getElementById('produits-container');
-    const div = document.createElement('div');
-    div.innerHTML = html;
-    container.prepend(div.firstElementChild);
-    
-    document.getElementById('empty-msg').style.display = 'none';
-    mettreAJourRecap();
-}
-
-function supprimerProduit(btn) {
-    btn.closest('.produit-row').remove();
-    renuméroterLignes();
-    if (document.querySelectorAll('.produit-row').length === 0) {
-        document.getElementById('empty-msg').style.display = '';
+        rows.forEach(row => {
+            const select = row.querySelector('.produit-select');
+            // إلا ما تختارش produit → نحيد row
+            if (!select.value) {
+                row.remove();
+            }
+        });
     }
-    mettreAJourRecap();
-}
 
-function renuméroterLignes() {
-    document.querySelectorAll('.produit-row').forEach((row, i) => {
-        row.querySelector('.num-row').textContent = i + 1;
-    });
-}
+    function ajouterProduit() {
+        const template = document.getElementById('produit-template').innerHTML;
+        const idx = compteur++;
+        const html = template.replace(/__INDEX__/g, idx).replace(/__NUM__/g, document.querySelectorAll('.produit-row').length + 1);
+        
+        const container = document.getElementById('produits-container');
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        container.prepend(div.firstElementChild);
+        
+        document.getElementById('empty-msg').style.display = 'none';
+        mettreAJourRecap();
+    }
 
-function onProduitChange(select) {
-    const option = select.selectedOptions[0];
-    const row = select.closest('.produit-row');
-    const stockInfo = row.querySelector('.stock-info');
-    const qteInput = row.querySelector('.produit-qte');
-    
-    if (option.value) {
-        const stock = parseInt(option.dataset.stock);
-        const statut = option.dataset.statut;
-        const colors = { normal: 'text-success', faible: 'text-warning', rupture: 'text-danger' };
-        const icons = { normal: '✓', faible: '⚠', rupture: '✗' };
+    function supprimerProduit(btn) {
+        btn.closest('.produit-row').remove();
+        renuméroterLignes();
+        if (document.querySelectorAll('.produit-row').length === 0) {
+            document.getElementById('empty-msg').style.display = '';
+        }
+        mettreAJourRecap();
+    }
+
+    function renuméroterLignes() {
+        document.querySelectorAll('.produit-row').forEach((row, i) => {
+            row.querySelector('.num-row').textContent = i + 1;
+        });
+    }
+
+    function onProduitChange(select) {
+        const option = select.selectedOptions[0];
+        const row = select.closest('.produit-row');
+        const stockInfo = row.querySelector('.stock-info');
+        const qteInput = row.querySelector('.produit-qte');
         
-        stockInfo.innerHTML = `<span class="${colors[statut] || ''}">
-            ${icons[statut] || ''} Stock disponible : <strong>${stock}</strong>
-        </span>`;
-        
-        qteInput.max = stock;
-        if (stock === 0) {
-            qteInput.value = 0;
-            qteInput.disabled = true;
+        if (option.value) {
+            const stock = parseInt(option.dataset.stock);
+            const statut = option.dataset.statut;
+            const colors = { normal: 'text-success', faible: 'text-warning', rupture: 'text-danger' };
+            const icons = { normal: '✓', faible: '⚠', rupture: '✗' };
+            
+            stockInfo.innerHTML = `<span class="${colors[statut] || ''}">
+                ${icons[statut] || ''} Stock disponible : <strong>${stock}</strong>
+            </span>`;
+            
+            qteInput.max = stock;
+            if (stock === 0) {
+                qteInput.value = 0;
+                qteInput.disabled = true;
+            } else {
+                qteInput.disabled = false;
+            }
         } else {
-            qteInput.disabled = false;
+            stockInfo.innerHTML = '';
         }
-    } else {
-        stockInfo.innerHTML = '';
+        
+        calculerLigne(qteInput);
     }
-    
-    calculerLigne(qteInput);
-}
 
-function calculerLigne(input) {
-    const row = input.closest('.produit-row');
-    const select = row.querySelector('.produit-select');
-    const qte = parseFloat(input.value) || 0;
-    const option = select.selectedOptions[0];
-    const prix = option ? parseFloat(option.dataset.prix || 0) : 0;
-    const total = qte * prix;
-    
-    row.querySelector('.ligne-total').textContent = total.toFixed(2);
-    mettreAJourRecap();
-}
+    function calculerLigne(input) {
+        const row = input.closest('.produit-row');
+        const select = row.querySelector('.produit-select');
+        const qte = parseFloat(input.value) || 0;
+        const option = select.selectedOptions[0];
+        const prix = option ? parseFloat(option.dataset.prix || 0) : 0;
+        const total = qte * prix;
+        
+        row.querySelector('.ligne-total').textContent = total.toFixed(2);
+        mettreAJourRecap();
+    }
 
-function mettreAJourRecap() {
-    const rows = document.querySelectorAll('.produit-row');
-    let grandTotal = 0;
-    
-    rows.forEach(row => {
-        const val = parseFloat(row.querySelector('.ligne-total').textContent) || 0;
-        grandTotal += val;
+    function mettreAJourRecap() {
+        const rows = document.querySelectorAll('.produit-row');
+        let grandTotal = 0;
+        
+        rows.forEach(row => {
+            const val = parseFloat(row.querySelector('.ligne-total').textContent) || 0;
+            grandTotal += val;
+        });
+        
+        document.getElementById('recap-nb-produits').textContent = rows.length;
+        document.getElementById('recap-total').textContent = grandTotal.toFixed(2) + ' MAD';
+    }
+
+    // Ajouter une ligne par défaut
+    document.addEventListener('DOMContentLoaded', function() {
+        ajouterProduit();
     });
-    
-    document.getElementById('recap-nb-produits').textContent = rows.length;
-    document.getElementById('recap-total').textContent = grandTotal.toFixed(2) + ' MAD';
-}
-
-// Ajouter une ligne par défaut
-document.addEventListener('DOMContentLoaded', function() {
-    ajouterProduit();
-});
 </script>
 @endpush

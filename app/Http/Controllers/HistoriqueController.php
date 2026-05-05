@@ -51,108 +51,95 @@ class HistoriqueController extends Controller
         return view('historique.create', compact('clients', 'produits'));
     }
 
-public function store(Request $request)
-{
-    $validated = $request->validate([
-        'id_client' => 'required|exists:clients,id_client',
-        'date_service' => 'required|date',
-        'remarque' => 'nullable|string',
-        'statut' => 'required|in:en_cours,termine,annule',
-        'produits' => 'nullable|array',
-        'produits.*.id_produit' => 'required_with:produits|exists:produits,id_produit',
-        'produits.*.quantite' => 'required_with:produits|integer|min:1',
-        'charges' => 'required|numeric|min:0',
-    ], [
-        'id_client.required' => 'Veuillez sélectionner un client.',
-        'date_service.required' => 'La date du service est obligatoire.',
-        'charges.required' => 'Les frais de service sont obligatoires.',
-        'charges.numeric' => 'Les frais doivent être un nombre.',
-        'charges.min' => 'Les frais doivent être positifs.',
-    ]);
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'id_client' => 'required|exists:clients,id_client',
+            'date_service' => 'required|date',
+            'remarque' => 'nullable|string',
+            'statut' => 'required|in:en_cours,termine,annule',
+            'produits' => 'nullable|array',
+            'produits.*.id_produit' => 'required_with:produits|exists:produits,id_produit',
+            'produits.*.quantite' => 'required_with:produits|integer|min:1',
+            'charges' => 'required|numeric|min:0',
+        ], [
+            'id_client.required' => 'Veuillez sélectionner un client.',
+            'date_service.required' => 'La date du service est obligatoire.',
+            'charges.required' => 'Les frais de service sont obligatoires.',
+            'charges.numeric' => 'Les frais doivent être un nombre.',
+            'charges.min' => 'Les frais doivent être positifs.',
+        ]);
 
-    DB::beginTransaction();
+        DB::beginTransaction();
 
-    try {
+        try {
+            // ✔ produits optionnel
+            $produits = $validated['produits'] ?? [];
+            // ✅ Vérification stock
+            if (!empty($produits)) {
+                foreach ($produits as $item) {
+                    $produit = Produit::findOrFail($item['id_produit']);
 
-        // ✔ produits optionnel
-        $produits = $validated['produits'] ?? [];
-
-        // ✅ Vérification stock
-        if (!empty($produits)) {
-            foreach ($produits as $item) {
-                $produit = Produit::findOrFail($item['id_produit']);
-
-                if ($produit->quantite_stock < $item['quantite']) {
-                    throw new \Exception(
-                        "Stock insuffisant pour : {$produit->nom_produit} (Disponible: {$produit->quantite_stock})"
-                    );
+                    if ($produit->quantite_stock < $item['quantite']) {
+                        throw new \Exception(
+                            "Stock insuffisant pour : {$produit->nom_produit} (Disponible: {$produit->quantite_stock})"
+                        );
+                    }
                 }
             }
-        }
 
-        // ✅ Création historique
-        $historique = Historique::create([
-            'id_client' => $validated['id_client'],
-            'date_service' => $validated['date_service'],
-            'charges' => $validated['charges'],
-            'remarque' => $validated['remarque'] ?? null,
-            'statut' => $validated['statut'],
-            'montant_total' => 0,
-        ]);
+            // ✅ Création historique
+            $historique = Historique::create([
+                'id_client' => $validated['id_client'],
+                'date_service' => $validated['date_service'],
+                'charges' => $validated['charges'],
+                'remarque' => $validated['remarque'] ?? null,
+                'statut' => $validated['statut'],
+                'montant_total' => 0,
+            ]);
+            $montantTotal = 0;
 
-        $montantTotal = 0;
-
-        // ✅ Ajout produits (optionnel)
-        if (!empty($produits)) {
-            foreach ($produits as $item) {
-
-                $produit = Produit::findOrFail($item['id_produit']);
-
-                $prixTotal = $produit->prix_vente * $item['quantite'];
-
-                DetailHistorique::create([
-                    'id_historique' => $historique->id_historique,
-                    'id_produit' => $produit->id_produit,
-                    'quantite_utilisee' => $item['quantite'],
-                    'prix_vente' => $produit->prix_vente,
-                    'prix_total' => $prixTotal,
-                ]);
-
-                // Décrément stock
-                $produit->decrementerStock(
-                    $item['quantite'],
-                    $historique->id_historique,
-                    "Service client : {$historique->client->nom}"
-                );
-
-                $montantTotal += $prixTotal;
+            // ✅ Ajout produits (optionnel)
+            if (!empty($produits)) {
+                foreach ($produits as $item) {
+                    $produit = Produit::findOrFail($item['id_produit']);
+                    $prixTotal = $produit->prix_vente * $item['quantite'];
+                    DetailHistorique::create([
+                        'id_historique' => $historique->id_historique,
+                        'id_produit' => $produit->id_produit,
+                        'quantite_utilisee' => $item['quantite'],
+                        'prix_vente' => $produit->prix_vente,
+                        'prix_total' => $prixTotal,
+                    ]);
+                    // Décrément stock
+                    $produit->decrementerStock(
+                        $item['quantite'],
+                        $historique->id_historique,
+                        "Service client : {$historique->client->nom}"
+                    );
+                    $montantTotal += $prixTotal;
+                }
             }
+
+            // ✅ Ajouter charges même sans produits
+            $montantTotal += $validated['charges'];
+            // ✅ Mise à jour total
+            $historique->update([
+                'montant_total' => $montantTotal
+            ]);
+            DB::commit();
+            return redirect()
+                ->route('historique.show', $historique)
+                ->with('success', 'Service enregistré avec succès.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', $e->getMessage());
         }
-
-        // ✅ Ajouter charges même sans produits
-        $montantTotal += $validated['charges'];
-
-        // ✅ Mise à jour total
-        $historique->update([
-            'montant_total' => $montantTotal
-        ]);
-
-        DB::commit();
-
-        return redirect()
-            ->route('historique.show', $historique)
-            ->with('success', 'Service enregistré avec succès.');
-
-    } catch (\Exception $e) {
-
-        DB::rollBack();
-
-        return redirect()
-            ->back()
-            ->withInput()
-            ->with('error', $e->getMessage());
     }
-}
+
     public function show(Historique $historique)
     {
         $historique->load(['client', 'details.produit.categorie', 'mouvementsStock.produit']);
@@ -174,13 +161,82 @@ public function store(Request $request)
         $validated = $request->validate([
             'remarque' => 'nullable|string',
             'statut' => 'required|in:en_cours,termine,annule',
+            'produits' => 'nullable|array',
+            'produits.*.id_produit' => 'required_with:produits|exists:produits,id_produit',
+            'produits.*.quantite' => 'required_with:produits|integer|min:1',
         ]);
 
-        $historique->update($validated);
+        DB::beginTransaction();
+        try {
+            $produits = $validated['produits'] ?? [];
+            // 📌 1. Récupérer anciens produits
+            $anciensDetails = $historique->details()->get()->keyBy('id_produit');
+            // 📌 2. Remettre stock (rollback total ancien)
+            foreach ($anciensDetails as $detail) {
+                $produit = Produit::find($detail->id_produit);
+                if ($produit) {
+                    $produit->increment('quantite_stock', $detail->quantite_utilisee);
+                }
+            }
+            // 📌 3. Supprimer anciens détails
+            $historique->details()->delete();
+            $montantTotal = 0;
 
-        return redirect()->route('historique.show', $historique)
-            ->with('success', 'Service modifié avec succès.');
+            // 📌 4. Ajouter nouveaux produits
+            if (!empty($produits)) {
+                foreach ($produits as $item) {
+                    $produit = Produit::findOrFail($item['id_produit']);
+                    // 🔴 Vérifier stock
+                    if ($produit->quantite_stock < $item['quantite']) {
+                        throw new \Exception("Stock insuffisant pour : {$produit->nom_produit}");
+                    }
+                    $prixTotal = $produit->prix_vente * $item['quantite'];
+                    DetailHistorique::create([
+                        'id_historique' => $historique->id_historique,
+                        'id_produit' => $produit->id_produit,
+                        'quantite_utilisee' => $item['quantite'],
+                        'prix_vente' => $produit->prix_vente,
+                        'prix_total' => $prixTotal,
+                    ]);
+                    // 🔻 Décrément stock
+                    $produit->decrement('quantite_stock', $item['quantite']);
+                    $montantTotal += $prixTotal;
+                }
+            }
+
+            // 📌 5. Mettre à jour historique
+            $historique->update([
+                'remarque' => $validated['remarque'] ?? null,
+                'statut' => $validated['statut'],
+                'montant_total' => $montantTotal + ($historique->charges ?? 0),
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('historique.show', $historique)
+                ->with('success', 'Service modifié avec succès.');
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', $e->getMessage());
+        }
     }
+    // public function update(Request $request, Historique $historique)
+    // {
+    //     $validated = $request->validate([
+    //         'remarque' => 'nullable|string',
+    //         'statut' => 'required|in:en_cours,termine,annule',
+    //     ]);
+
+    //     $historique->update($validated);
+
+    //     return redirect()->route('historique.show', $historique)
+    //         ->with('success', 'Service modifié avec succès.');
+    // }
 
     public function destroy(Historique $historique)
     {
