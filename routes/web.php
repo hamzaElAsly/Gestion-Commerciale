@@ -19,7 +19,7 @@ Route::get('/', function () {
     return redirect()->route('dashboard');
 });
 
-// Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth'])->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -53,6 +53,6 @@ Route::get('/', function () {
     Route::get('/stock/etat', [StockController::class, 'etatStock'])->name('stock.etat');
     Route::post('/stock/entree', [StockController::class, 'entreeStock'])->name('stock.entree');
 
-// });
+});
 
 require __DIR__.'/auth.php';

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion — GestPro</title>
+    <title>Connexion — CHARRAK TECHNOLOGIE</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -12,7 +12,7 @@
         body{font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;display:flex;background:var(--slate);overflow:hidden}
 
         /* ──── PANNEAU GAUCHE ──── */
-        .auth-left{flex:1;position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:60px 64px;background:linear-gradient(150deg,#1e3a8a 0%,#3730a3 45%,#1e1b4b 100%);overflow:hidden}
+        .auth-left{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;padding:60px 64px;background:linear-gradient(150deg,#1e3a8a 0%,#3730a3 45%,#1e1b4b 100%);overflow:hidden}
         .auth-left::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:48px 48px}
         .orb{position:absolute;border-radius:50%;filter:blur(70px);animation:drift 12s ease-in-out infinite;pointer-events:none}
         .orb-1{width:500px;height:500px;background:rgba(99,102,241,.35);top:-180px;right:-130px;animation-delay:0s}
@@ -35,7 +35,7 @@
         .sp .sl{font-size:10.5px;color:rgba(255,255,255,.45);margin-top:3px;text-transform:uppercase;letter-spacing:.04em}
 
         /* ──── PANNEAU DROIT ──── */
-        .auth-right{width:520px;min-height:100vh;background:white;display:flex;flex-direction:column;justify-content:center;padding:56px 52px;overflow-y:auto;position:relative}
+        .auth-right{width:520px;min-height:100vh;background:white;display:flex;flex-direction:column;padding:56px 52px;overflow-y:auto;position:relative}
         .auth-right::after{content:'';position:absolute;bottom:-50px;left:-50px;width:160px;height:160px;border-radius:50%;background:linear-gradient(135deg,rgba(37,99,235,.05),rgba(79,70,229,.05));pointer-events:none}
 
         .step-lbl{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin-bottom:10px;display:flex;align-items:center;gap:7px}
@@ -94,8 +94,8 @@
     <div class="orb orb-3"></div>
 
     <div class="lc">
-        <div class="logo-badge">G</div>
-        <h1 class="lt">GestPro</h1>
+        <div class="logo-badge"><img  src="{{ asset('images/Logo.png') }}"style="width: 100%" alt="Logo"></div>
+        <h1 class="lt">CHARRAK TECHNOLOGIE</h1>
         <p class="ls">La solution complète pour piloter votre activité commerciale, votre stock et vos devis.</p>
 
         <div class="fc">
@@ -126,9 +126,6 @@
 <!-- ════ DROITE ════ -->
 <div class="auth-right">
     <div class="step-lbl">Authentification</div>
-    <h1 class="fh">Bon retour 👋</h1>
-    <p class="fsub">Connectez-vous à votre espace de gestion</p>
-
     @if($errors->any())
     <div class="alert-err">
         <i class="bi bi-exclamation-circle-fill" style="font-size:18px;flex-shrink:0;"></i>

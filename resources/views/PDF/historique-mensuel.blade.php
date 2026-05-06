@@ -110,28 +110,22 @@
 <table>
     <thead>
         <tr>
-            {{-- <th style="width:5%">#</th> --}}
-            {{-- <th style="width:18%">Client</th>
-            <th style="width:10%">Date</th>
-            <th style="width:35%">Produits utilisés</th>
-            <th style="width:15%">Remarque</th>
-            <th style="width:10%">Frais service</th>
-            <th style="width:12%;text-align:right">Montant</th> --}}
+            <th>#</th>
             <th>Client</th>
             <th>Date</th>
-            <th style="width:45%">Produits utilisés</th>
+            <th colspan="2">Produits utilisés</th>
             <th>Remarque</th>
             <th>Frais service</th>
             <th style="text-align:right">Montant</th>
-            {{-- <th style="width:5%;text-align:center">Statut</th> --}}
         </tr>
     </thead>
 
     <tbody>
         @forelse($historiques as $h)
         <tr>
-            {{-- <td class="muted">#{{ $h->id_historique }}</td> --}}
-
+            <td>
+                {{ $h->id_historique }}
+            </td>
             <td style="font-weight:600;">
                 {{ $h->client->nom ?? 'N/A' }}
             </td>
@@ -141,7 +135,7 @@
             </td>
 
             <!-- ✅ PRODUITS -->
-            <td>
+            <td colspan="2">
                 @foreach($h->details as $d)
                     <span style="font-size:10px; background:#f1f5f9; padding:2px 6px; border-radius:3px; margin-right:3px; margin-bottom:2px; display:inline-block;">
                         {{ $d->produit->nom_produit ?? '?' }} ×{{ $d->quantite_utilisee }} ={{ number_format($d->prix_total, 2) }} MAD
@@ -156,19 +150,13 @@
 
             <!-- ✅ CHARGES -->
             <td class="muted text-right">
-                {{ number_format($h->charges, 2) }} MAD
+                {{ number_format($h->charges, 2) }}
             </td>
 
             <!-- ✅ MONTANT -->
             <td class="text-right money" style="color:#1a56db;">
-                {{ number_format($h->montant_total, 2) }} MAD
+                {{ number_format($h->montant_total, 2) }}
             </td>
-
-            <!-- ✅ STATUT -->
-            {{-- <td class="text-center" style="font-size:9px;font-weight:bold;color:
-                {{ $h->statut === 'termine' ? '#059669' : ($h->statut === 'annule' ? '#dc2626' : '#d97706') }}">
-                {{ $h->statut_label }}
-            </td> --}}
         </tr>
         @empty
         <tr>
