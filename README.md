@@ -1,6 +1,6 @@
-# 🔧 Charrak TECHNOLOGIE — Application de Gestion Commerciale & Stock
+# Charrak TECHNOLOGIE — Application de Gestion Commerciale & Stock
 
-## 🎯 Présentation
+## 1_ Présentation
 
 **Charrak TECHNOLOGIE** est une application web complète destinée aux artisans, techniciens et petites entreprises de services qui ont besoin de :
 
@@ -12,63 +12,63 @@
 
 ---
 
-## ✨ Fonctionnalités
+## 2_ Fonctionnalités
 
-### 🏠 Tableau de bord
+### Tableau de bord
 - Statistiques globales (clients, CA mensuel, services, alertes stock)
 - 5 derniers services avec liens rapides
 - Alertes stock faible en temps réel
 - Top 5 clients par chiffre d'affaires
 - Derniers mouvements de stock
 
-### 👤 Gestion des Clients
-- ✅ Ajouter / Modifier / Supprimer un client
-- ✅ Recherche par nom, téléphone ou adresse
-- ✅ Fiche client détaillée avec historique des services
-- ✅ Statistiques par client (nombre de services, total dépensé)
+### Gestion des Clients
+- Ajouter / Modifier / Supprimer un client
+- Recherche par nom, téléphone ou adresse
+- Fiche client détaillée avec historique des services
+- Statistiques par client (nombre de services, total dépensé)
 
-### 🏷️ Gestion des Catégories
-- ✅ CRUD complet des catégories de produits
-- ✅ Compteur de produits par catégorie
-- ✅ Protection suppression si catégorie utilisée
+### Gestion des Catégories
+- CRUD complet des catégories de produits
+- Compteur de produits par catégorie
+- Protection suppression si catégorie utilisée
 
-### 📦 Gestion des Produits
-- ✅ CRUD complet avec catégorie associée
-- ✅ Suivi du stock en temps réel avec alertes visuelles
-- ✅ Seuil d'alerte personnalisable par produit
-- ✅ Réapprovisionnement rapide directement depuis la liste
-- ✅ 3 statuts : Normal / Faible / Rupture (avec code couleur)
-- ✅ Historique complet des mouvements par produit
+### Gestion des Produits
+- CRUD complet avec catégorie associée
+- Suivi du stock en temps réel avec alertes visuelles
+- Seuil d'alerte personnalisable par produit
+- Réapprovisionnement rapide directement depuis la liste
+- 3 statuts : Normal / Faible / Rupture (avec code couleur)
+- Historique complet des mouvements par produit
 
-### 📋 Historique des Services
-- ✅ Enregistrement d'un service avec sélection client + produits
-- ✅ **Décrémentation automatique du stock** lors de la création
-- ✅ Calcul automatique du montant total
-- ✅ Filtres par client, mois, année et statut
-- ✅ Détail complet de chaque service (produits, quantités, prix)
-- ✅ **Impression PDF de la facture** par service
-- ✅ Suppression avec restauration automatique du stock
+### Historique des Services
+- Enregistrement d'un service avec sélection client + produits
+- **Décrémentation automatique du stock** lors de la création
+- Calcul automatique du montant total
+- Filtres par client, mois, année et statut
+- Détail complet de chaque service (produits, quantités, prix)
+- **Impression PDF de la facture** par service
+- Suppression avec restauration automatique du stock
 
-### 📊 Gestion du Stock
-- ✅ État du stock en temps réel avec valeur totale
-- ✅ Historique de tous les mouvements (entrées/sorties)
-- ✅ Filtres par produit, type de mouvement, période
-- ✅ Réapprovisionnement avec enregistrement du motif
-- ✅ Lien entre mouvement de stock et service client
+### Gestion du Stock
+- État du stock en temps réel avec valeur totale
+- Historique de tous les mouvements (entrées/sorties)
+- Filtres par produit, type de mouvement, période
+- Réapprovisionnement avec enregistrement du motif
+- Lien entre mouvement de stock et service client
 
-### 📄 Export PDF
-- ✅ Facture professionnelle par service
-- ✅ Rapport mensuel complet avec récapitulatif par client
-- ✅ Filtres par mois, année et client
+### Export PDF
+- Facture professionnelle par service
+- Rapport mensuel complet avec récapitulatif par client
+- Filtres par mois, année et client
 
 ---
 
-## 🛠️ Technologies utilisées
+## 3_ Technologies utilisées
 
 | Composant       | Technologie            | Version |
 |-----------------|------------------------|---------|
-| Framework       | Laravel                | 10.x    |
-| Langage         | PHP                    | 8.1+    |
+| Framework       | Laravel                | 12.x    |
+| Langage         | PHP                    | 8.5+    |
 | Base de données | MySQL                  | 8.0+    |
 | Frontend        | Blade + Bootstrap      | 5.3     |
 | Icônes          | Bootstrap Icons        | 1.11    |
@@ -78,7 +78,7 @@
 
 ---
 
-## 📁 Architecture du projet
+## 4_ Architecture du projet
 
 ```
 gestion-commerciale/
@@ -158,11 +158,11 @@ gestion-commerciale/
 
 ---
 
-## 🚀 Installation
+## 5_ Installation
 
 ### Prérequis
 
-- PHP >= 8.1
+- PHP >= 8.5
 - Composer
 - MySQL 8.0+
 - Node.js (optionnel, pour assets)
@@ -204,20 +204,12 @@ DB_PASSWORD=votre_mot_de_passe
 ### Étape 3 — Base de données
 
 ```bash
-# Créer la base de données
-mysql -u root -p -e "CREATE DATABASE gestion_commerciale CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-
 # Exécuter les migrations
 php artisan migrate
 
 # Peupler avec les données de test (27 produits, 12 clients, 25+ services)
 php artisan db:seed
 ```
-
-> ⚡ **Ou importez directement le script SQL :**
-> ```bash
-> mysql -u root -p gestion_commerciale < database/gestion_commerciale.sql
-> ```
 
 ### Étape 4 — Lancer le serveur
 
@@ -229,16 +221,16 @@ Accédez à : **http://localhost:8000**
 
 ---
 
-## 🔐 Connexion
+## 6_ Connexion
 
-| Champ | Valeur |
-|-------|--------|
+| Champ | Valeur           |
+|-------|------------------|
 | Email | `admin@gmail.ma` |
-| Mot de passe | `password` |
+| Mot de passe | `password`|
 
 ---
 
-## 🗄️ Configuration de la base de données
+## 7_ Configuration de la base de données
 
 ### Schéma relationnel
 
@@ -281,7 +273,7 @@ gestion_stocks
 
 ---
 
-## 🌱 Données de test
+## 8_ Données de test
 
 Le seeder génère automatiquement :
 
@@ -303,7 +295,7 @@ Après le seed, ces produits déclenchent des alertes :
 
 ---
 
-## 📐 Modules détaillés
+## 9_ Modules détaillés
 
 ### Logique de décrémentation automatique du stock
 
@@ -330,7 +322,7 @@ Lors de l'enregistrement d'un service (POST /historique) :
 
 ---
 
-## 🔗 Routes disponibles
+## 10_ Routes disponibles
 
 ```
 GET    /dashboard
@@ -380,7 +372,7 @@ POST   /logout
 
 ---
 
-## 🚀 Déploiement en production
+## 11_ Déploiement en production
 
 ```bash
 # Optimisation Laravel pour la production
@@ -395,7 +387,7 @@ APP_DEBUG=false
 ```
 
 
-## 📸 Captures d'écran
+## 12_ Captures d'écran
 
 > Les captures d'écran sont disponibles après installation.
 
@@ -411,37 +403,13 @@ APP_DEBUG=false
 
 ---
 
-## 🔧 Commandes utiles
-
-```bash
-# Migrations fraîches + seed
-php artisan migrate:fresh --seed
-
-# Cache laravel
-php artisan cache:clear
-php artisan config:clear
-php artisan route:clear
-php artisan view:clear
-
-# Logs en temps réel
-tail -f storage/logs/laravel.log
-
-# Tinker (console interactive)
-php artisan tinker
-
-# Lister les routes
-php artisan route:list
-```
-
----
-
-## 📦 Dépendances principales
+## 13_ Dépendances principales
 
 ```json
 {
   "require": {
-    "php": "^8.1",
-    "laravel/framework": "^10.0",
+    "php": "^8.5",
+    "laravel/framework": "^12.0",
     "barryvdh/laravel-dompdf": "^2.0",
     "laravel/sanctum": "^3.2"
   }
@@ -450,21 +418,9 @@ php artisan route:list
 
 ---
 
-## 🤝 Contribution
-
-Ce projet est développé comme projet de fin d'études (PFE). Les contributions sont les bienvenues.
-
-1. Forkez le projet
-2. Créez une branche : `git checkout -b feature/ma-fonctionnalite`
-3. Committez : `git commit -m "Ajout de ma fonctionnalité"`
-4. Push : `git push origin feature/ma-fonctionnalite`
-5. Ouvrez une Pull Request
-
----
-
 ## 👨‍💻 Auteur
 
-Développé avec ❤️ pour un projet de fin d'études (PFE) de niveau professionnel.
+Développé avec [hamzaElAsly](https://github.com/hamzaElAsly) pour un projet de fin d'études (PFE) de niveau professionnel.
 
 - **Stack** : Laravel 12 + MySQL + Bootstrap 5
 - **Architecture** : MVC Clean
