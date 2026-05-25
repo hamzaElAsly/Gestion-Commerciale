@@ -80,7 +80,7 @@
             <div class="company" style="font-size:16px;font-weight:bold;color:#1a56db;">
                 <img src="{{ public_path('storage/images/Logo.png') }}" alt="Logo" style="height: 80px;">
             </div>
-            <div class="company">Ste. CHARRAK TECHNOLOGIE</div>
+            <div class="company">Ste. CHARRAK TECHNOLOGY</div>
             <div class="company" style="margin-top:6px;">Imprimé le {{ now()->format('d/m/Y') }}</div>{{--  à H:i --}}
         </div>
         <div class="header-right">

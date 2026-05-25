@@ -14,6 +14,7 @@ class Devis extends Model
     protected $primaryKey = 'id_devis';
 
     protected $fillable = [
+        'titre',
         'id_devis',
         'nom_client',
         'montant_total',

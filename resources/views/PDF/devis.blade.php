@@ -191,7 +191,7 @@
             <div class="company-name">
                 <img src="{{ public_path('storage/images/Logo.png') }}" alt="Logo" style="height: 80px;">
             </div>
-            <div class="company-sub">Ste. CHARRAK TECHNOLOGIE</div>
+            <div class="company-sub">Ste. CHARRAK TECHNOLOGY</div>
             <div class="company-sub" style="margin-top: 8px;">📍 Fès, Maroc</div>
             <div class="company-sub">📞 +212 622-390028</div>
         </div>
@@ -210,6 +210,10 @@
         <div style="display: table-cell; width: 50%; vertical-align: top;">
             <div class="info-label">Devis à</div>
             <div class="info-value">{{ $devis->nom_client }}</div>
+        </div>
+        <div style="display: table-cell; width: 50%; vertical-align: top;">
+            <div class="info-label">Titre</div>
+            <div class="info-value">{{ $devis->titre }}</div>
         </div>
     </div>
 
@@ -232,7 +236,7 @@
             @foreach($devis->details as $idx => $detail)
             <tr>
                 <td style="color: #94a3b8;">{{ $idx + 1 }}</td>
-                <td style="font-weight: 600;">{{ $detail->produit->nom_produit ?? 'N/A' }}</td>
+                <td style="font-weight: 600;">{{ $detail->nom_produit ?? 'N/A' }}</td>
                 {{-- <td style="color: #64748b;">{{ $detail->produit->categorie->nom_categorie ?? '—' }}</td> --}}
                 <td style="text-align: center; font-weight: bold;">{{ $detail->quantite }}</td>
                 <td style="text-align: right; font-family: monospace;">{{ number_format($detail->prix_vente, 2) }} MAD</td>
@@ -246,18 +250,6 @@
     <div style="display: table; width: 100%;">
         <div style="display: table-cell; width: 45%; vertical-align: top; padding-left: 20px;">
             <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
-                {{-- <div style="display: table; width: 100%; padding: 6px 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 6px;">
-                    <div style="display: table-cell; color: #64748b; font-size: 12px;">Sous-total :</div>
-                    <div style="display: table-cell; text-align: right; font-size: 12px; font-weight: bold; font-family: monospace;">
-                        {{ number_format($devis->montant_total, 2) }} MAD
-                    </div>
-                </div>
-                <div style="display: table; width: 100%; padding: 6px 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 6px;">
-                    <div style="display: table-cell; color: #64748b; font-size: 12px;">TVA (20%) :</div>
-                    <div style="display: table-cell; text-align: right; font-size: 12px; font-family: monospace;">
-                        {{ number_format($historique->montant_total * 0.2, 2) }} MAD
-                    </div>
-                </div> --}}
                 <div style="background: #1a56db; color: white; padding: 12px; border-radius: 6px; display: table; width: 100%; margin-top: 8px;">
                     <div style="display: table-cell; font-size: 13px; font-weight: bold;">TOTAL À PAYER</div>
                     <div style="display: table-cell; text-align: right; font-size: 18px; font-weight: bold; font-family: monospace;">

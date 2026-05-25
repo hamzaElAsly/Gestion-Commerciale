@@ -52,7 +52,7 @@
                     @foreach($devis->details as $index => $detail)
                     <tr>
                         <td>{{ $index + 1 }}</td>
-                        <td>{{ $detail->produit->nom_produit ?? 'N/A' }}</td>
+                        <td>{{ $detail->nom_produit ?? 'N/A' }}</td>
                         <td>{{ number_format($detail->prix_vente, 2) }} MAD</td>
                         <td>{{ $detail->quantite }}</td>
                         <td><strong>{{ number_format($detail->prix_total, 2) }} MAD</strong></td>

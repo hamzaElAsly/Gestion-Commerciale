@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('devis', function (Blueprint $table) {
             $table->id('id_devis');
+            $table->string('titre', 100);
             $table->string('nom_client', 100);
             $table->decimal('montant_total', 10, 2)->default(0);
             $table->softDeletes();

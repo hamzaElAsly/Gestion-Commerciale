@@ -16,7 +16,7 @@
 </div>
 
 <div class="row justify-content-center">
-    <div class="col-lg-7">
+    <div class="col-lg-9">
         <div class="card">
             <div class="card-header">
                 <i class="bi bi-box-seam-fill me-2 text-primary"></i> Informations du Devis
@@ -24,10 +24,17 @@
             <div class="card-body">
                 <form method="POST" action="{{ route('devis.store') }}">
                     @csrf
-                    <!-- Nom client -->
-                    <div class="mb-3">
-                        <label>Nom Client</label>
-                        <input type="text" name="nom_client" class="form-control" required>
+                    <!-- Titre Devis -->
+                    <div class="row d-flex justify-content-between">
+                      <div class="w-50 mb-3 float-start">
+                          <label>Titre Devis</label>
+                          <input type="text" name="titre" class="form-control" required>
+                      </div>
+                      <!-- Nom client -->
+                      <div class="w-50 mb-3 float-end">
+                          <label>Nom Client</label>
+                          <input type="text" name="nom_client" class="form-control" required>
+                      </div>
                     </div>
 
                     <!-- Produits -->
@@ -41,13 +48,25 @@
                                 <th></th>
                             </tr>
                         </thead>
-                        <tbody></tbody>
+                        <tbody>
+                        </tbody>
                     </table>
-
-                    <button type="button" class="btn btn-primary" onclick="addRow()">+ Ajouter produit</button>
-
-                    <h4 class="mt-3">Total: <span id="grand-total">0</span> MAD</h4>
-
+                    {{-- <h4 class="mt-3">Total Général : <span id="grand-total">0.00</span> DH</h4> --}}
+                    <div class="row d-flex justify-content-between">
+                      <div class="w-50 mb-3 float-start">
+                        <button type="button" class="btn btn-primary" onclick="addRow()">+ Ajouter produit</button>
+                      </div>
+                      <div class="w-50 mb-3 float-end">
+                        <h4 class="mt-3">Total: 
+                            <span id="grand-total">
+                              0.00
+                            </span> MAD
+                            <noscript>
+                                <small class="text-danger">(Calculé sans JavaScript)</small>
+                            </noscript>
+                        </h4>
+                      </div>
+                    </div>
                     <button type="submit" class="btn btn-success mt-3">Enregistrer</button>
                 </form>
             </div>
@@ -56,77 +75,53 @@
 </div>
 
 <script>
-let index = 0;
-
-// produits depuis Laravel
-const produits = @json($produits);
-
+let index = 1;
 function addRow() {
     let row = `
     <tr>
         <td>
-            <select name="produits[${index}][id_produit]" class="form-control" onchange="updatePrice(this)">
-                <option value="">-- Choisir --</option>
-                ${produits.map(p => `<option value="${p.id_produit}" data-price="${p.prix_vente}">${p.nom_produit}</option>`).join('')}
-            </select>
+            <input type="text" name="produits[${index}][nom_produit]" class="form-control" placeholder="Nom produit" required>
         </td>
-
         <td>
-            <input type="text" class="form-control prix" readonly>
+            <input type="number" step="0.01" name="produits[${index}][prix]" class="form-control prix"
+                placeholder="Prix" min="0" oninput="calculateRow(this)" required >
         </td>
-
         <td>
-            <input type="number" name="produits[${index}][quantite]" class="form-control quantite" value="1" min="1" oninput="calculateRow(this)">
+            <input type="number" name="produits[${index}][quantite]"
+                class="form-control quantite" value="1" min="1"
+                oninput="calculateRow(this)" required >
         </td>
-
         <td>
-            <input type="text" class="form-control total" readonly>
+            <input type="number" step="0.01" name="produits[${index}][total]" class="form-control total" readonly >
         </td>
-
         <td>
-            <button type="button" class="btn btn-danger" onclick="removeRow(this)">X</button>
+            <button type="button" class="btn btn-danger" onclick="removeRow(this)"> X </button>
         </td>
     </tr>
     `;
-
     document.querySelector('#produits-table tbody').insertAdjacentHTML('beforeend', row);
     index++;
 }
 
-function removeRow(btn) {
-    btn.closest('tr').remove();
-    calculateTotal();
-}
-
-function updatePrice(select) {
-    let price = select.selectedOptions[0].dataset.price || 0;
-    let row = select.closest('tr');
-
-    row.querySelector('.prix').value = price;
-    calculateRow(select);
-}
-
-function calculateRow(element) {
-    let row = element.closest('tr');
-
-    let price = parseFloat(row.querySelector('.prix').value) || 0;
-    let qty = parseInt(row.querySelector('.quantite').value) || 0;
-
-    let total = price * qty;
-
-    row.querySelector('.total').value = total.toFixed(2);
-
-    calculateTotal();
-}
-
 function calculateTotal() {
     let total = 0;
-
     document.querySelectorAll('.total').forEach(el => {
         total += parseFloat(el.value) || 0;
     });
 
     document.getElementById('grand-total').innerText = total.toFixed(2);
 }
+
+function calculateRow(element) {
+    let row = element.closest('tr');
+    let prix = parseFloat(row.querySelector('.prix').value) || 0;
+    let quantite = parseInt(row.querySelector('.quantite').value) || 0;
+    let total = prix * quantite;
+    row.querySelector('.total').value = total.toFixed(2);
+    calculateTotal();
+}
+
+function removeRow(button) { button.closest('tr').remove(); }
+
 </script>
 @endsection

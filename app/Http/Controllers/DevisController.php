@@ -20,57 +20,51 @@ class DevisController extends Controller
     // ➕ CREATE
     public function create()
     {
-        $produits = Produit::all();
-        return view('devis.create', compact('produits'));
+        return view('devis.create');
     }
 
     // 💾 STORE
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'titre' => 'required|string|max:150',
             'nom_client' => 'required|string|max:150',
-
             'produits' => 'required|array|min:1',
-            'produits.*.id_produit' => 'required|exists:produits,id_produit',
+            'produits.*.nom_produit' => 'required|string|max:255',
+            'produits.*.prix' => 'required|numeric|min:0',
             'produits.*.quantite' => 'required|integer|min:1',
         ]);
 
         DB::beginTransaction();
 
         try {
+
             $devis = Devis::create([
+                'titre' => $validated['titre'],
                 'nom_client' => $validated['nom_client'],
                 'montant_total' => 0
             ]);
-
             $total = 0;
-
             foreach ($validated['produits'] as $item) {
-                $produit = Produit::findOrFail($item['id_produit']);
-
-                // $prixTotal = $produit->prix_vente * $item['quantite'];
-                $prix = (float) $produit->prix_vente;
+                $prix = (float) $item['prix'];
                 $qty  = (int) $item['quantite'];
                 $prixTotal = $prix * $qty;
-                // dd($devis->nom_client, $prix, $qty, $prixTotal);
-
                 DetailDevis::create([
                     'id_devis' => $devis->id_devis,
-                    'id_produit' => $produit->id_produit,
+                    'nom_produit' => $item['nom_produit'],
                     'quantite' => $qty,
                     'prix_vente' => $prix,
                     'prix_total' => $prixTotal,
                 ]);
-                // ❌ NO STOCK DECREMENT (comme demandé)
                 $total += $prixTotal;
             }
-            $devis->update(['montant_total' => $total]);
+            $devis->update([ 'montant_total' => $total ]);
 
             DB::commit();
 
-            return redirect()->route('devis.show', $devis)
+            return redirect()
+                ->route('devis.show', $devis)
                 ->with('success', 'Devis créé avec succès');
-
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withInput()->with('error', $e->getMessage());
@@ -80,7 +74,7 @@ class DevisController extends Controller
     // 👁️ SHOW
     public function show($id)
     {
-        $devis = Devis::with('details.produit')->findOrFail($id);
+        $devis = Devis::findOrFail($id);
         return view('devis.show', compact('devis'));
     }
 
@@ -88,18 +82,19 @@ class DevisController extends Controller
     public function edit($id)
     {
         $devis = Devis::with('details')->findOrFail($id);
-        $produits = Produit::all();
-        return view('devis.edit', compact('devis', 'produits'));
+        return view('devis.edit', compact('devis'));
+        
     }
 
     // 🔄 UPDATE
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
+            'titre' => 'required|string|max:150',
             'nom_client' => 'required|string|max:150',
-
             'produits' => 'required|array|min:1',
-            'produits.*.id_produit' => 'required|exists:produits,id_produit',
+            'produits.*.nom_produit' => 'required|string|max:255',
+            'produits.*.prix' => 'required|numeric|min:0',
             'produits.*.quantite' => 'required|integer|min:1',
         ]);
 
@@ -107,29 +102,26 @@ class DevisController extends Controller
 
         try {
             $devis = Devis::findOrFail($id);
-            $devis->update([ 'nom_client' => $validated['nom_client'] ]);
-            // حذف القديم
+            $devis->update([ 
+                'titre' => $validated['titre'],
+                'nom_client' => $validated['nom_client'] ]
+            );
             DetailDevis::where('id_devis', $devis->id_devis)->delete();
             $total = 0;
             foreach ($validated['produits'] as $item) {
-                $produit = Produit::findOrFail($item['id_produit']);
-
-                $prix = (float) $produit->prix_vente;
+                $prix = (float) $item['prix'];
                 $qty  = (int) $item['quantite'];
                 $prixTotal = $prix * $qty;
-
                 DetailDevis::create([
                     'id_devis' => $devis->id_devis,
-                    'id_produit' => $produit->id_produit,
+                    'nom_produit' => $item['nom_produit'],
                     'quantite' => $qty,
                     'prix_vente' => $prix,
                     'prix_total' => $prixTotal,
                 ]);
-                // dd($prix, $qty, $prixTotal);
                 $total += $prixTotal;
             }
-
-            $devis->update(['montant_total' => $total]);
+            $devis->update([ 'montant_total' => $total ]);
 
             DB::commit();
 
@@ -155,7 +147,7 @@ class DevisController extends Controller
     // 🧾 PDF
     public function print($id)
     {
-        $devis = Devis::with('details.produit')->findOrFail($id);
+        $devis = Devis::findOrFail($id);
         $pdf = Pdf::loadView('pdf.devis', compact('devis'))->setPaper('a4', 'portrait');
         return $pdf->download("devis-{$devis->id_devis}.pdf");
     }

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('detail_devis', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_devis')->constrained('devis', 'id_devis')->cascadeOnDelete();
-            $table->foreignId('id_produit')->constrained('produits', 'id_produit');
+            $table->string('nom_produit');
             $table->integer('quantite');
             $table->decimal('prix_vente', 10, 2);
             $table->decimal('prix_total', 10, 2);

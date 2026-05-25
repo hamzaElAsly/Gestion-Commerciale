@@ -27,6 +27,7 @@
             <thead class="table-dark">
                 <tr>
                     <th>#</th>
+                    <th>Titre</th>
                     <th>Client</th>
                     <th>Date</th>
                     <th>Total</th>
@@ -38,6 +39,7 @@
                 @forelse($devis as $d)
                 <tr>
                     <td>{{ $d->id_devis }}</td>
+                    <td>{{ $d->titre }}</td>
                     <td>{{ $d->nom_client }}</td>
                     <td>{{ $d->created_at->format('d/m/Y') }}</td>
                     <td>

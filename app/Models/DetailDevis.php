@@ -11,7 +11,7 @@ class DetailDevis extends Model
 
     protected $fillable = [
         'id_devis',
-        'id_produit',
+        'nom_produit',
         'quantite',
         'prix_vente',
         'prix_total',
@@ -27,10 +27,10 @@ class DetailDevis extends Model
         return $this->belongsTo(Devis::class, 'id_devis', 'id_devis');
     }
 
-    public function produit() 
-    {
-        return $this->belongsTo(Produit::class, 'id_produit');
-    }
+    // public function produit() 
+    // {
+    //     return $this->belongsTo(Produit::class, 'id_produit');
+    // }
 
     protected static function boot()
     {
