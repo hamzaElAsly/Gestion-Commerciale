@@ -169,7 +169,7 @@
         </table>
     </div>
     @if($produits->hasPages())
-    <div class="card-body border-top py-3">{{ $produits->links() }}</div>
+    <div class="card-body bg-orange-400 border-top py-3">{{ $produits->links() }}</div>
     @endif
 </div>
 @endsection

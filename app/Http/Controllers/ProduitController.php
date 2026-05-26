@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Produit;
-// use App\Models\Categorie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -13,7 +12,6 @@ class ProduitController extends Controller
     {
         $query = Produit::with('categorie');
         if ($request->filled('search')) { $query->where('nom_produit', 'LIKE', "%{$request->search}%"); }
-        // if ($request->filled('categorie')) { $query->where('id_categorie', $request->categorie); }
         if ($request->filled('stock')) {
             match($request->stock) {
                 'faible' => $query->stockFaible()->where('quantite_stock', '>', 0),
@@ -22,18 +20,11 @@ class ProduitController extends Controller
                 default => null,
             };
         }
-
         $produits = $query->orderBy('nom_produit')->paginate(15)->withQueryString();
-        // $categories = Categorie::orderBy('nom_categorie')->get();
-
-        return view('produits.index', compact('produits')); //'categories'
+        return view('produits.index', compact('produits'));
     }
 
-    public function create()
-    {
-        // $categories = Categorie::orderBy('nom_categorie')->get();
-        return view('produits.create'); //compact('categories')
-    }
+    public function create() { return view('produits.create'); }
 
     public function store(Request $request)
     {
@@ -77,11 +68,7 @@ class ProduitController extends Controller
         return view('produits.show', compact('produit', 'mouvements'));
     }
 
-    public function edit(Produit $produit)
-    {
-        // $categories = Categorie::orderBy('nom_categorie')->get();
-        return view('produits.edit', compact('produit'));//'categories'
-    }
+    public function edit(Produit $produit) { return view('produits.edit', compact('produit')); }
 
     public function update(Request $request, Produit $produit)
     {
