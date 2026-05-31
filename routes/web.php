@@ -8,6 +8,7 @@ use App\Http\Controllers\ProduitController;
 use App\Http\Controllers\HistoriqueController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\DevisController;
+use App\Http\Controllers\VenteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,6 +48,9 @@ Route::middleware(['auth'])->group(function () {
     // Devis
     Route::resource('devis', DevisController::class);
     Route::get('devis/{id}/print', [DevisController::class, 'print'])->name('devis.print');
+
+    // Ventes
+    Route::resource('vente', VenteController::class);
 
     // Gestion du stock
     Route::get('/stock', [StockController::class, 'index'])->name('stock.index');

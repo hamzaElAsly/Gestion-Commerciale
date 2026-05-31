@@ -12,7 +12,8 @@ class VenteController extends Controller
 {
     public function index()
     {
-        //
+        $ventes = Vente::latest()->paginate(10);
+        return view('vente.index', compact('ventes'));
     }
 
     /**
@@ -98,11 +99,14 @@ class VenteController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit($id)
     {
         $vente = Vente::with('details')->findOrFail($id);
-        $produits = Produit::where('quantite_stock', '>', 0)->get();
-        return view('vente.edit', compact('vente', 'produits'));
+        $produits = Produit::all();
+        return view('vente.edit', compact(
+            'vente',
+            'produits'
+        ));
     }
 
     /**
