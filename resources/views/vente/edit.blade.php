@@ -1,29 +1,43 @@
 @extends('layouts.app')
-@section('title', 'Nouvelle Vente')
+@section('title', 'Modifier Vente #' . str_pad($vente->id_vente, 4, '0', STR_PAD_LEFT))
 @section('page-title', 'Ventes')
 
 @section('content')
 <div class="page-header">
     <div>
-        <h1>Nouvelle Vente</h1>
+        <h1>Modifier Vente #{{ str_pad($vente->id_vente, 4, '0', STR_PAD_LEFT) }}</h1>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item"><a href="{{ route('vente.index') }}" class="text-muted">Ventes</a></li>
-                <li class="breadcrumb-item active text-muted">Nouvelle</li>
+                <li class="breadcrumb-item">
+                    <a href="{{ route('vente.show', $vente) }}" class="text-muted">
+                        #{{ str_pad($vente->id_vente, 4, '0', STR_PAD_LEFT) }}
+                    </a>
+                </li>
+                <li class="breadcrumb-item active text-muted">Modifier</li>
             </ol>
         </nav>
     </div>
 </div>
 
-<form method="POST" action="{{ route('vente.store') }}" id="form-vente">
-@csrf
+{{-- Alerte info update --}}
+<div class="alert d-flex gap-2 mb-4"
+     style="background:#fefce8;border:1px solid #fde68a;border-radius:10px;color:#92400e;font-size:13.5px;">
+    <i class="bi bi-info-circle-fill" style="flex-shrink:0;font-size:16px;margin-top:1px;"></i>
+    <div>
+        <strong>Modification du stock :</strong>
+        L'ancien stock sera <strong>restauré</strong> automatiquement avant d'appliquer les nouvelles quantités.
+    </div>
+</div>
+
+<form method="POST" action="{{ route('vente.update', $vente) }}" id="form-vente">
+@csrf @method('PUT')
 
 <div class="row g-4">
 
-    {{-- ── Colonne gauche : infos générales + récapitulatif ── --}}
+    {{-- ── Colonne gauche ── --}}
     <div class="col-lg-4">
 
-        {{-- Infos générales --}}
         <div class="card mb-4">
             <div class="card-header">
                 <i class="bi bi-person-fill me-2 text-primary"></i>Informations
@@ -36,25 +50,19 @@
                         <span class="input-group-text"><i class="bi bi-person"></i></span>
                         <input type="text" name="nom_client"
                                class="form-control @error('nom_client') is-invalid @enderror"
-                               placeholder="Ex : Mohamed Alami"
-                               value="{{ old('nom_client') }}" required autofocus>
+                               value="{{ old('nom_client', $vente->nom_client) }}" required>
                     </div>
                     @error('nom_client')<div class="text-danger mt-1" style="font-size:12px;">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">
-                        Frais / Service (MAD) <span class="text-danger">*</span>
-                        <i class="bi bi-info-circle text-muted ms-1"
-                           title="Frais de déplacement, main d'œuvre, etc."
-                           data-bs-toggle="tooltip"></i>
-                    </label>
+                    <label class="form-label">Frais / Charges (MAD) <span class="text-danger">*</span></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-cash"></i></span>
                         <input type="number" name="charges" id="charges"
                                class="form-control @error('charges') is-invalid @enderror"
-                               min="0" step="0.01" placeholder="0.00"
-                               value="{{ old('charges', 0) }}"
+                               min="0" step="0.01"
+                               value="{{ old('charges', $vente->charges) }}"
                                oninput="recalcTotal()" required>
                         <span class="input-group-text">MAD</span>
                     </div>
@@ -70,9 +78,8 @@
                 <div class="fw-bold text-primary mb-3">
                     <i class="bi bi-calculator me-2"></i>Récapitulatif
                 </div>
-
                 <div class="d-flex justify-content-between mb-2" style="font-size:13.5px;">
-                    <span class="text-muted">Lignes produits :</span>
+                    <span class="text-muted">Lignes :</span>
                     <span class="fw-semibold" id="recap-nb">0</span>
                 </div>
                 <div class="d-flex justify-content-between mb-2" style="font-size:13.5px;">
@@ -88,48 +95,44 @@
                     <span class="fw-bold text-primary">Total TTC :</span>
                     <span class="fw-bold text-primary money" id="recap-total" style="font-size:16px;">0.00 MAD</span>
                 </div>
-
                 <button type="submit" class="btn btn-primary w-100 mt-3">
-                    <i class="bi bi-check-circle-fill me-2"></i>Enregistrer la vente
+                    <i class="bi bi-check-circle-fill me-2"></i>Mettre à jour
                 </button>
+                <a href="{{ route('vente.show', $vente) }}" class="btn btn-light w-100 mt-2">
+                    Annuler
+                </a>
             </div>
         </div>
 
     </div>
 
-    {{-- ── Colonne droite : lignes produits (optionnelles) ── --}}
+    {{-- ── Colonne droite : lignes produits ── --}}
     <div class="col-lg-8">
         <div class="card">
             <div class="card-header d-flex align-items-center justify-content-between">
                 <span>
                     <i class="bi bi-box-seam-fill me-2 text-primary"></i>
-                    Produits utilisés
-                    <span class="badge bg-light text-muted ms-2" style="font-size:11px;">Optionnel</span>
+                    Produits
+                    <span class="badge bg-light text-muted ms-1" style="font-size:11px;">Optionnel</span>
                 </span>
                 <button type="button" class="btn btn-primary btn-sm" onclick="ajouterLigne()">
-                    <i class="bi bi-plus-lg me-1"></i>Ajouter un produit
+                    <i class="bi bi-plus-lg me-1"></i>Ajouter
                 </button>
             </div>
 
             <div class="card-body">
 
-                {{-- Message erreur global --}}
                 @if(session('error'))
                 <div class="alert alert-danger d-flex gap-2 mb-3">
                     <i class="bi bi-x-circle-fill"></i> {{ session('error') }}
                 </div>
                 @endif
 
-                {{-- Zone lignes --}}
                 <div id="lignes-container"></div>
 
-                {{-- Placeholder vide --}}
-                <div id="empty-msg" class="text-center py-5 text-muted">
-                    <i class="bi bi-box-seam" style="font-size:2.5rem;display:block;opacity:.25;margin-bottom:10px;"></i>
-                    <div style="font-size:13.5px;">Aucun produit ajouté.</div>
-                    <div style="font-size:12px;margin-top:4px;color:#94a3b8;">
-                        La vente sera enregistrée avec les charges uniquement.
-                    </div>
+                <div id="empty-msg" class="text-center py-4 text-muted" style="display:none;">
+                    <i class="bi bi-box-seam" style="font-size:2rem;display:block;opacity:.25;margin-bottom:8px;"></i>
+                    Aucun produit — vente de charges uniquement.
                 </div>
 
             </div>
@@ -139,7 +142,7 @@
 </div>
 </form>
 
-{{-- ═══ TEMPLATE LIGNE (masqué) ═══ --}}
+{{-- Template ligne --}}
 <template id="tpl-ligne">
     <div class="produit-row border rounded-3 p-3 mb-2 bg-white" data-idx="__IDX__">
         <div class="d-flex justify-content-between align-items-center mb-2">
@@ -151,53 +154,41 @@
                 <i class="bi bi-x-lg"></i>
             </button>
         </div>
-
         <div class="row g-2">
-            {{-- Sélecteur produit --}}
             <div class="col-md-6">
                 <label class="form-label">Produit</label>
                 <select name="produits[__IDX__][id_produit]"
                         class="form-select select-produit"
                         onchange="onSelectProduit(this)" required>
-                    <option value="">— Choisir un produit —</option>
+                    <option value="">— Choisir —</option>
                     @foreach($produits as $p)
                     <option value="{{ $p->id_produit }}"
                             data-prix="{{ $p->prix_vente }}"
                             data-stock="{{ $p->quantite_stock }}"
                             data-statut="{{ $p->statut_stock }}"
-                            {{ $p->quantite_stock == 0 ? 'data-rupture=1' : '' }}>
+                            data-selected-stock="{{ $p->quantite_stock }}">
                         {{ $p->nom_produit }}
-                        @if($p->quantite_stock == 0)
-                            — ❌ Rupture
-                        @elseif($p->stock_faible)
-                            — ⚠ Stock faible ({{ $p->quantite_stock }})
-                        @else
-                            — ({{ $p->quantite_stock }} dispo)
+                        @if($p->quantite_stock == 0) — ❌ Rupture
+                        @elseif($p->stock_faible)    — ⚠ {{ $p->quantite_stock }} dispo
+                        @else                         — {{ $p->quantite_stock }} dispo
                         @endif
                     </option>
                     @endforeach
                 </select>
             </div>
-
-            {{-- Quantité --}}
             <div class="col-md-2">
                 <label class="form-label">Quantité</label>
                 <input type="number" name="produits[__IDX__][quantite]"
                        class="form-control input-qte"
-                       min="1" value="1"
-                       oninput="recalcLigne(this)" required>
+                       min="1" value="1" oninput="recalcLigne(this)" required>
                 <div class="stock-hint mt-1" style="font-size:11px;"></div>
             </div>
-
-            {{-- Prix unitaire --}}
             <div class="col-md-2">
                 <label class="form-label">Prix unit.</label>
                 <div class="form-control bg-light text-end money input-prix">—</div>
             </div>
-
-            {{-- Total ligne --}}
             <div class="col-md-2">
-                <label class="form-label">Total ligne</label>
+                <label class="form-label">Total</label>
                 <div class="form-control bg-light fw-bold text-end money text-primary input-total">0.00</div>
             </div>
         </div>
@@ -207,12 +198,21 @@
 
 @push('scripts')
 <script>
-/* ═══════════════════════════════════════════
-   GESTION DYNAMIQUE DES LIGNES PRODUITS
-   ═══════════════════════════════════════════ */
+/* ══════════════════════════════
+   DONNÉES INITIALES (lignes existantes)
+   ══════════════════════════════ */
+const existingLines = @json($vente->details->map(fn($d) => [
+    'id_produit' => $d->id_produit,
+    'quantite'   => $d->quantite,
+    'prix_vente' => $d->prix_vente,
+    'prix_total' => $d->prix_total,
+    'nom_produit'=> $d->nom_produit,
+]));
+
 let compteur = 0;
 
-function ajouterLigne() {
+/* ── Ajouter une ligne ── */
+function ajouterLigne(idProduit = null, qte = 1) {
     const tpl  = document.getElementById('tpl-ligne').innerHTML;
     const idx  = compteur++;
     const num  = document.querySelectorAll('.produit-row').length + 1;
@@ -220,17 +220,27 @@ function ajouterLigne() {
 
     const wrap = document.createElement('div');
     wrap.innerHTML = html;
-    document.getElementById('lignes-container').appendChild(wrap.firstElementChild);
-
+    const row = wrap.firstElementChild;
+    document.getElementById('lignes-container').appendChild(row);
     document.getElementById('empty-msg').style.display = 'none';
+
+    if (idProduit) {
+        const sel = row.querySelector('.select-produit');
+        sel.value = idProduit;
+        onSelectProduit(sel);
+        const qteEl = row.querySelector('.input-qte');
+        qteEl.value = qte;
+        recalcLigne(qteEl);
+    }
+
     recalcTotal();
 }
 
 function supprimerLigne(btn) {
     btn.closest('.produit-row').remove();
     renuméroter();
-    const restant = document.querySelectorAll('.produit-row').length;
-    if (restant === 0) document.getElementById('empty-msg').style.display = '';
+    if (!document.querySelectorAll('.produit-row').length)
+        document.getElementById('empty-msg').style.display = '';
     recalcTotal();
 }
 
@@ -240,7 +250,6 @@ function renuméroter() {
     });
 }
 
-/* ─── Sélection d'un produit ─── */
 function onSelectProduit(sel) {
     const row   = sel.closest('.produit-row');
     const opt   = sel.selectedOptions[0];
@@ -259,63 +268,49 @@ function onSelectProduit(sel) {
     const stock  = parseInt(opt.dataset.stock);
     const prix   = parseFloat(opt.dataset.prix);
     const statut = opt.dataset.statut;
+    const c = { normal:'#059669', faible:'#d97706', rupture:'#dc2626' };
+    const i = { normal:'✓', faible:'⚠', rupture:'✗' };
+    hint.innerHTML = `<span style="color:${c[statut]};">${i[statut]} Stock : <strong>${stock}</strong></span>`;
 
-    // Afficher le stock disponible
-    const couleurs = { normal: '#059669', faible: '#d97706', rupture: '#dc2626' };
-    const icones   = { normal: '✓', faible: '⚠', rupture: '✗' };
-    hint.innerHTML = `<span style="color:${couleurs[statut]||'#64748b'};">
-        ${icones[statut]||''} Stock : <strong>${stock}</strong>
-    </span>`;
-
-    // Bloquer si rupture
     if (stock === 0) {
-        qteEl.value    = 0;
-        qteEl.disabled = true;
-        qteEl.max      = 0;
+        qteEl.value = 0; qteEl.disabled = true; qteEl.max = 0;
     } else {
-        qteEl.disabled = false;
-        qteEl.max      = stock;
-        qteEl.value    = Math.min(parseInt(qteEl.value) || 1, stock);
+        qteEl.disabled = false; qteEl.max = stock;
+        qteEl.value = Math.min(parseInt(qteEl.value) || 1, stock);
     }
-
     prixEl.textContent = prix.toFixed(2);
     recalcLigne(qteEl);
 }
 
-/* ─── Recalcul d'une ligne ─── */
-function recalcLigne(qteInput) {
-    const row   = qteInput.closest('.produit-row');
-    const sel   = row.querySelector('.select-produit');
-    const opt   = sel.selectedOptions[0];
-    const prix  = opt && opt.value ? parseFloat(opt.dataset.prix) : 0;
-    const qte   = parseFloat(qteInput.value) || 0;
+function recalcLigne(qteEl) {
+    const row  = qteEl.closest('.produit-row');
+    const sel  = row.querySelector('.select-produit');
+    const opt  = sel.selectedOptions[0];
+    const prix = opt && opt.value ? parseFloat(opt.dataset.prix) : 0;
+    const qte  = parseFloat(qteEl.value) || 0;
     row.querySelector('.input-total').textContent = (prix * qte).toFixed(2);
     recalcTotal();
 }
 
-/* ─── Recalcul du récapitulatif ─── */
 function recalcTotal() {
     let sousTot = 0;
-    document.querySelectorAll('.produit-row').forEach(row => {
-        sousTot += parseFloat(row.querySelector('.input-total').textContent) || 0;
+    document.querySelectorAll('.produit-row').forEach(r => {
+        sousTot += parseFloat(r.querySelector('.input-total').textContent) || 0;
     });
-
     const charges = parseFloat(document.getElementById('charges').value) || 0;
-    const total   = sousTot + charges;
     const nb      = document.querySelectorAll('.produit-row').length;
-
     document.getElementById('recap-nb').textContent         = nb;
     document.getElementById('recap-sous-total').textContent = sousTot.toFixed(2) + ' MAD';
     document.getElementById('recap-charges').textContent    = charges.toFixed(2) + ' MAD';
-    document.getElementById('recap-total').textContent      = total.toFixed(2) + ' MAD';
+    document.getElementById('recap-total').textContent      = (sousTot + charges).toFixed(2) + ' MAD';
 }
 
-// Init tooltips Bootstrap
+/* ── Initialiser avec les lignes existantes ── */
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
-        new bootstrap.Tooltip(el);
-    });
-    recalcTotal();
+    if (existingLines.length === 0) {
+        document.getElementById('empty-msg').style.display = '';
+    }
+    existingLines.forEach(l => ajouterLigne(l.id_produit, l.quantite));
 });
 </script>
 @endpush

@@ -51,7 +51,9 @@ Route::middleware(['auth'])->group(function () {
 
     // Ventes
     Route::resource('vente', VenteController::class);
-
+    Route::get('vente/{id}/imprimer', [VenteController::class, 'imprimerTicket'])->name('vente.imprimer');
+    Route::get('/api/vente/produit/{produit}', [VenteController::class, 'getProduitInfo'])->name('api.vente.produit');
+    
     // Gestion du stock
     Route::get('/stock', [StockController::class, 'index'])->name('stock.index');
     Route::get('/stock/etat', [StockController::class, 'etatStock'])->name('stock.etat');

@@ -266,8 +266,7 @@
             1 RUE 1 HY SIDI HADI ZOUAGHA RCE NOUR MAG 2 30000 SECTEUR 0502 FES <br>
                 **TEL 06 22 39 00 28***IF68334179***ICE003778507000061 <br>
                         COMPTE BANQUER 011270000023210000549604
-    </div>
-
+        </div>
     </div>
 
 </div>
