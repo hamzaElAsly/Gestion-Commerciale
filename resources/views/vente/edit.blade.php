@@ -45,25 +45,25 @@
             <div class="card-body">
 
                 <div class="mb-3">
-                    <label class="form-label">Nom du client <span class="text-danger">*</span></label>
+                    <label class="form-label">Nom du client</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-person"></i></span>
                         <input type="text" name="nom_client"
                                class="form-control @error('nom_client') is-invalid @enderror"
-                               value="{{ old('nom_client', $vente->nom_client) }}" required>
+                               value="{{ old('nom_client', $vente->nom_client) }}">
                     </div>
                     @error('nom_client')<div class="text-danger mt-1" style="font-size:12px;">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Frais / Charges (MAD) <span class="text-danger">*</span></label>
+                    <label class="form-label">Frais / service (MAD)</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-cash"></i></span>
                         <input type="number" name="charges" id="charges"
                                class="form-control @error('charges') is-invalid @enderror"
                                min="0" step="0.01"
                                value="{{ old('charges', $vente->charges) }}"
-                               oninput="recalcTotal()" required>
+                               oninput="recalcTotal()">
                         <span class="input-group-text">MAD</span>
                     </div>
                     @error('charges')<div class="text-danger mt-1" style="font-size:12px;">{{ $message }}</div>@enderror
@@ -112,8 +112,10 @@
             <div class="card-header d-flex align-items-center justify-content-between">
                 <span>
                     <i class="bi bi-box-seam-fill me-2 text-primary"></i>
-                    Produits
-                    <span class="badge bg-light text-muted ms-1" style="font-size:11px;">Optionnel</span>
+                    Produits  <span class="text-danger">*</span>
+                    @error('produits')<div class="text-danger mt-1" style="font-size:12px;">{{ $message }}</div>@enderror
+                    @error('produits.*.quantite')<div class="text-danger mt-1" style="font-size:12px;">{{ $message }}</div>@enderror
+                    {{-- <span class="badge bg-light text-muted ms-1" style="font-size:11px;">Optionnel</span> --}}
                 </span>
                 <button type="button" class="btn btn-primary btn-sm" onclick="ajouterLigne()">
                     <i class="bi bi-plus-lg me-1"></i>Ajouter
@@ -196,121 +198,228 @@
 </template>
 @endsection
 
+@php
+    $existingLines = $vente->details->map(function ($d) {
+        return [
+            'id_produit'  => $d->id_produit,
+            'quantite'    => $d->quantite,
+            'prix_vente'  => $d->prix_vente,
+            'prix_total'  => $d->prix_total,
+            'nom_produit' => $d->nom_produit,
+        ];
+    })->values()->toArray();
+@endphp
+
 @push('scripts')
 <script>
-/* ══════════════════════════════
-   DONNÉES INITIALES (lignes existantes)
-   ══════════════════════════════ */
-const existingLines = @json($vente->details->map(fn($d) => [
-    'id_produit' => $d->id_produit,
-    'quantite'   => $d->quantite,
-    'prix_vente' => $d->prix_vente,
-    'prix_total' => $d->prix_total,
-    'nom_produit'=> $d->nom_produit,
-]));
 
-let compteur = 0;
+    const existingLines = {!! json_encode($existingLines) !!};
 
-/* ── Ajouter une ligne ── */
-function ajouterLigne(idProduit = null, qte = 1) {
-    const tpl  = document.getElementById('tpl-ligne').innerHTML;
-    const idx  = compteur++;
-    const num  = document.querySelectorAll('.produit-row').length + 1;
-    const html = tpl.replaceAll('__IDX__', idx).replaceAll('__NUM__', num);
+    let compteur = 0;
 
-    const wrap = document.createElement('div');
-    wrap.innerHTML = html;
-    const row = wrap.firstElementChild;
-    document.getElementById('lignes-container').appendChild(row);
-    document.getElementById('empty-msg').style.display = 'none';
+    /* ── Ajouter une ligne ── */
+    function ajouterLigne(idProduit = null, qte = 1) {
 
-    if (idProduit) {
-        const sel = row.querySelector('.select-produit');
-        sel.value = idProduit;
-        onSelectProduit(sel);
-        const qteEl = row.querySelector('.input-qte');
-        qteEl.value = qte;
+        const tpl  = document.getElementById('tpl-ligne').innerHTML;
+        const idx  = compteur++;
+        const num  = document.querySelectorAll('.produit-row').length + 1;
+
+        const html = tpl
+            .replaceAll('__IDX__', idx)
+            .replaceAll('__NUM__', num);
+
+        const wrap = document.createElement('div');
+        wrap.innerHTML = html;
+
+        const row = wrap.firstElementChild;
+
+        document
+            .getElementById('lignes-container')
+            .appendChild(row);
+
+        document.getElementById('empty-msg').style.display = 'none';
+
+        if (idProduit) {
+
+            const sel = row.querySelector('.select-produit');
+
+            sel.value = idProduit;
+
+            onSelectProduit(sel);
+
+            const qteEl = row.querySelector('.input-qte');
+
+            qteEl.value = qte;
+
+            recalcLigne(qteEl);
+        }
+
+        recalcTotal();
+    }
+
+    function supprimerLigne(btn) {
+
+        btn.closest('.produit-row').remove();
+
+        renumeroter();
+
+        if (!document.querySelectorAll('.produit-row').length) {
+            document.getElementById('empty-msg').style.display = '';
+        }
+
+        recalcTotal();
+    }
+
+    function renumeroter() {
+
+        document
+            .querySelectorAll('.produit-row .num-ligne')
+            .forEach((el, i) => {
+
+                el.textContent = i + 1;
+
+            });
+    }
+
+    function onSelectProduit(sel) {
+
+        const row    = sel.closest('.produit-row');
+        const opt    = sel.selectedOptions[0];
+        const hint   = row.querySelector('.stock-hint');
+        const qteEl  = row.querySelector('.input-qte');
+        const prixEl = row.querySelector('.input-prix');
+
+        if (!opt.value) {
+
+            hint.innerHTML = '';
+            prixEl.textContent = '—';
+
+            row.querySelector('.input-total').textContent = '0.00';
+
+            recalcTotal();
+
+            return;
+        }
+
+        const stock  = parseInt(opt.dataset.stock);
+        const prix   = parseFloat(opt.dataset.prix);
+        const statut = opt.dataset.statut;
+
+        const colors = {
+            normal: '#059669',
+            faible: '#d97706',
+            rupture: '#dc2626'
+        };
+
+        const icons = {
+            normal: '✓',
+            faible: '⚠',
+            rupture: '✗'
+        };
+
+        hint.innerHTML =
+            `<span style="color:${colors[statut]};">
+                ${icons[statut]} Stock :
+                <strong>${stock}</strong>
+            </span>`;
+
+        if (stock === 0) {
+
+            qteEl.value = 0;
+            qteEl.disabled = true;
+            qteEl.max = 0;
+
+        } else {
+
+            qteEl.disabled = false;
+            qteEl.max = stock;
+
+            qteEl.value = Math.min(
+                parseInt(qteEl.value) || 1,
+                stock
+            );
+        }
+
+        prixEl.textContent = prix.toFixed(2);
+
         recalcLigne(qteEl);
     }
 
-    recalcTotal();
-}
+    function recalcLigne(qteEl) {
 
-function supprimerLigne(btn) {
-    btn.closest('.produit-row').remove();
-    renuméroter();
-    if (!document.querySelectorAll('.produit-row').length)
-        document.getElementById('empty-msg').style.display = '';
-    recalcTotal();
-}
+        const row = qteEl.closest('.produit-row');
 
-function renuméroter() {
-    document.querySelectorAll('.produit-row .num-ligne').forEach((el, i) => {
-        el.textContent = i + 1;
-    });
-}
+        const sel = row.querySelector('.select-produit');
 
-function onSelectProduit(sel) {
-    const row   = sel.closest('.produit-row');
-    const opt   = sel.selectedOptions[0];
-    const hint  = row.querySelector('.stock-hint');
-    const qteEl = row.querySelector('.input-qte');
-    const prixEl= row.querySelector('.input-prix');
+        const opt = sel.selectedOptions[0];
 
-    if (!opt.value) {
-        hint.innerHTML = '';
-        prixEl.textContent = '—';
-        row.querySelector('.input-total').textContent = '0.00';
+        const prix =
+            opt && opt.value
+                ? parseFloat(opt.dataset.prix)
+                : 0;
+
+        const qte = parseFloat(qteEl.value) || 0;
+
+        row.querySelector('.input-total').textContent =
+            (prix * qte).toFixed(2);
+
         recalcTotal();
-        return;
     }
 
-    const stock  = parseInt(opt.dataset.stock);
-    const prix   = parseFloat(opt.dataset.prix);
-    const statut = opt.dataset.statut;
-    const c = { normal:'#059669', faible:'#d97706', rupture:'#dc2626' };
-    const i = { normal:'✓', faible:'⚠', rupture:'✗' };
-    hint.innerHTML = `<span style="color:${c[statut]};">${i[statut]} Stock : <strong>${stock}</strong></span>`;
+    function recalcTotal() {
 
-    if (stock === 0) {
-        qteEl.value = 0; qteEl.disabled = true; qteEl.max = 0;
-    } else {
-        qteEl.disabled = false; qteEl.max = stock;
-        qteEl.value = Math.min(parseInt(qteEl.value) || 1, stock);
+        let sousTot = 0;
+
+        document
+            .querySelectorAll('.produit-row')
+            .forEach(row => {
+
+                sousTot += parseFloat(
+                    row.querySelector('.input-total').textContent
+                ) || 0;
+
+            });
+
+        const charges =
+            parseFloat(
+                document.getElementById('charges').value
+            ) || 0;
+
+        const nb =
+            document.querySelectorAll('.produit-row').length;
+
+        document.getElementById('recap-nb').textContent = nb;
+
+        document.getElementById('recap-sous-total').textContent =
+            sousTot.toFixed(2) + ' MAD';
+
+        document.getElementById('recap-charges').textContent =
+            charges.toFixed(2) + ' MAD';
+
+        document.getElementById('recap-total').textContent =
+            (sousTot + charges).toFixed(2) + ' MAD';
     }
-    prixEl.textContent = prix.toFixed(2);
-    recalcLigne(qteEl);
-}
 
-function recalcLigne(qteEl) {
-    const row  = qteEl.closest('.produit-row');
-    const sel  = row.querySelector('.select-produit');
-    const opt  = sel.selectedOptions[0];
-    const prix = opt && opt.value ? parseFloat(opt.dataset.prix) : 0;
-    const qte  = parseFloat(qteEl.value) || 0;
-    row.querySelector('.input-total').textContent = (prix * qte).toFixed(2);
-    recalcTotal();
-}
+    document.addEventListener('DOMContentLoaded', () => {
 
-function recalcTotal() {
-    let sousTot = 0;
-    document.querySelectorAll('.produit-row').forEach(r => {
-        sousTot += parseFloat(r.querySelector('.input-total').textContent) || 0;
+        if (existingLines.length === 0) {
+
+            document.getElementById('empty-msg').style.display = '';
+
+        } else {
+
+            existingLines.forEach(line => {
+
+                ajouterLigne(
+                    line.id_produit,
+                    line.quantite
+                );
+
+            });
+        }
+
+        recalcTotal();
     });
-    const charges = parseFloat(document.getElementById('charges').value) || 0;
-    const nb      = document.querySelectorAll('.produit-row').length;
-    document.getElementById('recap-nb').textContent         = nb;
-    document.getElementById('recap-sous-total').textContent = sousTot.toFixed(2) + ' MAD';
-    document.getElementById('recap-charges').textContent    = charges.toFixed(2) + ' MAD';
-    document.getElementById('recap-total').textContent      = (sousTot + charges).toFixed(2) + ' MAD';
-}
 
-/* ── Initialiser avec les lignes existantes ── */
-document.addEventListener('DOMContentLoaded', () => {
-    if (existingLines.length === 0) {
-        document.getElementById('empty-msg').style.display = '';
-    }
-    existingLines.forEach(l => ajouterLigne(l.id_produit, l.quantite));
-});
 </script>
 @endpush

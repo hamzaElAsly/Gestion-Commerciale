@@ -62,19 +62,16 @@ class VenteController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nom_client'                  => 'required|string|max:150',
-            'charges'                     => 'required|numeric|min:0',
-            // produits = optionnel (nullable)
-            'produits'                    => 'nullable|array',
-            'produits.*.id_produit'       => 'required_with:produits|exists:produits,id_produit',
-            'produits.*.quantite'         => 'required_with:produits|integer|min:1',
+            'nom_client'            => 'nullable|string|max:150',
+            'charges'               => 'nullable|numeric|min:0',
+            'produits'              => 'required|array|min:1',
+            'produits.*.id_produit' => 'required|exists:produits,id_produit',
+            'produits.*.quantite'   => 'required|integer|min:1',
         ], [
-            'nom_client.required'         => 'Le nom du client est obligatoire.',
-            'charges.required'            => 'Les frais de service sont obligatoires.',
-            'charges.numeric'             => 'Les frais doivent être un nombre valide.',
-            'charges.min'                 => 'Les frais doivent être ≥ 0.',
-            'produits.*.id_produit'       => 'Produit invalide.',
-            'produits.*.quantite'         => 'Quantité invalide (minimum 1).',
+            'produits.required'     => 'Veuillez ajouter au moins un produit.',
+            'produits.min'          => 'Veuillez ajouter au moins un produit.',
+            'produits.*.id_produit.required' => 'Le produit est obligatoire.',
+            'produits.*.quantite.required'   => 'La quantité est obligatoire.',
         ]);
 
         DB::beginTransaction();
@@ -96,12 +93,12 @@ class VenteController extends Controller
 
             /* ── 2. Création de la vente ── */
             $vente = Vente::create([
-                'nom_client'    => $request->nom_client,
-                'charges'       => $request->charges,
+                'nom_client'    => $request->nom_client ?? '',
+                'charges'       => $request->charges ?? 0,
                 'montant_total' => 0,
             ]);
 
-            /* ── 3. Lignes produits (optionnel) ── */
+            /* ── 3. Lignes produits ── */
             $total = 0;
 
             foreach ($lignesProduits as $item) {
@@ -174,16 +171,17 @@ class VenteController extends Controller
     public function update(Request $request, string $id)
     {
         $vente = Vente::with('details')->findOrFail($id);
-
         $request->validate([
-            'nom_client'                  => 'required|string|max:150',
-            'charges'                     => 'required|numeric|min:0',
-            'produits'                    => 'nullable|array',
-            'produits.*.id_produit'       => 'required_with:produits|exists:produits,id_produit',
-            'produits.*.quantite'         => 'required_with:produits|integer|min:1',
+            'nom_client'            => 'nullable|string|max:150',
+            'charges'               => 'nullable|numeric|min:0',
+            'produits'              => 'required|array|min:1',
+            'produits.*.id_produit' => 'required|exists:produits,id_produit',
+            'produits.*.quantite'   => 'required|integer|min:1',
         ], [
-            'nom_client.required'   => 'Le nom du client est obligatoire.',
-            'charges.required'      => 'Les frais sont obligatoires.',
+            'produits.required'     => 'Veuillez ajouter au moins un produit.',
+            'produits.min'          => 'Veuillez ajouter au moins un produit.',
+            'produits.*.id_produit.required' => 'Le produit est obligatoire.',
+            'produits.*.quantite.required'   => 'La quantité est obligatoire.',
         ]);
 
         DB::beginTransaction();
@@ -249,9 +247,9 @@ class VenteController extends Controller
 
             /* ── 4. Mise à jour de la vente ── */
             $vente->update([
-                'nom_client'    => $request->nom_client,
-                'charges'       => $request->charges,
-                'montant_total' => $total + $request->charges,
+                'nom_client'    => $request->nom_client ?? '',
+                'charges'       => $request->charges ?? 0,
+                'montant_total' => $total + ($request->charges ?? 0),
             ]);
 
             DB::commit();

@@ -31,20 +31,20 @@
             <div class="card-body">
 
                 <div class="mb-3">
-                    <label class="form-label">Nom du client <span class="text-danger">*</span></label>
+                    <label class="form-label">Nom du client</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-person"></i></span>
                         <input type="text" name="nom_client"
                                class="form-control @error('nom_client') is-invalid @enderror"
-                               placeholder="Ex : Mohamed Alami"
-                               value="{{ old('nom_client') }}" required autofocus>
+                               placeholder="Tapez nom du client"
+                               value="{{ old('nom_client') }}" autofocus>
                     </div>
                     @error('nom_client')<div class="text-danger mt-1" style="font-size:12px;">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">
-                        Frais / Service (MAD) <span class="text-danger">*</span>
+                        Frais / Service (MAD)
                         <i class="bi bi-info-circle text-muted ms-1"
                            title="Frais de déplacement, main d'œuvre, etc."
                            data-bs-toggle="tooltip"></i>
@@ -55,7 +55,7 @@
                                class="form-control @error('charges') is-invalid @enderror"
                                min="0" step="0.01" placeholder="0.00"
                                value="{{ old('charges', 0) }}"
-                               oninput="recalcTotal()" required>
+                               oninput="recalcTotal()">
                         <span class="input-group-text">MAD</span>
                     </div>
                     @error('charges')<div class="text-danger mt-1" style="font-size:12px;">{{ $message }}</div>@enderror
@@ -103,8 +103,10 @@
             <div class="card-header d-flex align-items-center justify-content-between">
                 <span>
                     <i class="bi bi-box-seam-fill me-2 text-primary"></i>
-                    Produits utilisés
-                    <span class="badge bg-light text-muted ms-2" style="font-size:11px;">Optionnel</span>
+                    Produits utilisés <span class="text-danger">*</span> 
+                    @error('produits')<div class="text-danger mt-1" style="font-size:12px;">{{ $message }}</div>@enderror
+                    @error('produits.*.quantite')<div class="text-danger mt-1" style="font-size:12px;">{{ $message }}</div>@enderror
+                    {{-- <span class="badge bg-light text-muted ms-2" style="font-size:11px;">Optionnel</span> --}}
                 </span>
                 <button type="button" class="btn btn-primary btn-sm" onclick="ajouterLigne()">
                     <i class="bi bi-plus-lg me-1"></i>Ajouter un produit
@@ -128,7 +130,7 @@
                     <i class="bi bi-box-seam" style="font-size:2.5rem;display:block;opacity:.25;margin-bottom:10px;"></i>
                     <div style="font-size:13.5px;">Aucun produit ajouté.</div>
                     <div style="font-size:12px;margin-top:4px;color:#94a3b8;">
-                        La vente sera enregistrée avec les charges uniquement.
+                        La vente ne sera pas enregistrée avec les charges uniquement.
                     </div>
                 </div>
 
@@ -167,12 +169,9 @@
                             data-statut="{{ $p->statut_stock }}"
                             {{ $p->quantite_stock == 0 ? 'data-rupture=1' : '' }}>
                         {{ $p->nom_produit }}
-                        @if($p->quantite_stock == 0)
-                            — ❌ Rupture
-                        @elseif($p->stock_faible)
-                            — ⚠ Stock faible ({{ $p->quantite_stock }})
-                        @else
-                            — ({{ $p->quantite_stock }} dispo)
+                        @if($p->quantite_stock == 0) — ❌ Rupture
+                        @elseif($p->stock_faible)    — ⚠ Stock faible ({{ $p->quantite_stock }})
+                        @else                        — ({{ $p->quantite_stock }} dispo)
                         @endif
                     </option>
                     @endforeach
@@ -220,7 +219,7 @@ function ajouterLigne() {
 
     const wrap = document.createElement('div');
     wrap.innerHTML = html;
-    document.getElementById('lignes-container').appendChild(wrap.firstElementChild);
+    document.getElementById('lignes-container').prepend(wrap.firstElementChild);
 
     document.getElementById('empty-msg').style.display = 'none';
     recalcTotal();
