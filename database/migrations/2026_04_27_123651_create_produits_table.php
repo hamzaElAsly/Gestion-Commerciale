@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id('id_produit');
             $table->string('nom_produit', 150);
             // $table->foreignId('id_categorie')->constrained('categories', 'id_categorie')->onDelete('restrict');
-            $table->decimal('prix_unitaire', 10, 2);
-            $table->decimal('prix_vente', 10, 2);
+            $table->decimal('prix_unitaire', 10, 2)->default(0);
+            $table->decimal('prix_vente', 10, 2)->default(0);
             $table->integer('quantite_stock')->default(0);
             $table->integer('seuil_alerte')->default(5);
             $table->timestamp('date_ajout')->useCurrent();

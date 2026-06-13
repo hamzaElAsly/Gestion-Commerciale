@@ -104,7 +104,8 @@ class VenteController extends Controller
             foreach ($lignesProduits as $item) {
                 $produit  = Produit::findOrFail($item['id_produit']);
                 $qty      = (int) $item['quantite'];
-                $prix     = $produit->prix_vente;
+                // $prix     = $produit->prix_vente;
+                $prix = (float) $item['prixVente'];
                 $prixLigne = $prix * $qty;
 
                 DetailVente::create([
@@ -222,7 +223,8 @@ class VenteController extends Controller
             foreach ($lignesProduits as $item) {
                 $produit   = Produit::findOrFail($item['id_produit']);
                 $qty       = (int) $item['quantite'];
-                $prix      = $produit->prix_vente;
+                // $prix      = $produit->prix_vente;
+                $prix = (float) $item['prixVente'];
                 $prixLigne = $prix * $qty;
 
                 DetailVente::create([

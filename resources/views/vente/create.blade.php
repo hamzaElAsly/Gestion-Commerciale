@@ -188,10 +188,13 @@
                 <div class="stock-hint mt-1" style="font-size:11px;"></div>
             </div>
 
-            {{-- Prix unitaire --}}
+            {{-- Prix vente --}}
             <div class="col-md-2">
-                <label class="form-label">Prix unit.</label>
-                <div class="form-control bg-light text-end money input-prix">—</div>
+                <label class="form-label">Prix vente</label>
+                <input type="number" name="produits[__IDX__][prixVente]"
+                       class="form-control input-prix"
+                       min="0" step="0.01" value="0.00" oninput="recalcLigne(this)" required>
+                {{-- <div class="form-control bg-light text-end money input-prix">—</div> --}}
             </div>
 
             {{-- Total ligne --}}
@@ -206,115 +209,128 @@
 
 @push('scripts')
 <script>
-/* ═══════════════════════════════════════════
-   GESTION DYNAMIQUE DES LIGNES PRODUITS
-   ═══════════════════════════════════════════ */
-let compteur = 0;
+    /* ═══════════════════════════════════════════
+    GESTION DYNAMIQUE DES LIGNES PRODUITS
+    ═══════════════════════════════════════════ */
+    let compteur = 0;
 
-function ajouterLigne() {
-    const tpl  = document.getElementById('tpl-ligne').innerHTML;
-    const idx  = compteur++;
-    const num  = document.querySelectorAll('.produit-row').length + 1;
-    const html = tpl.replaceAll('__IDX__', idx).replaceAll('__NUM__', num);
+    function ajouterLigne() {
+        const tpl  = document.getElementById('tpl-ligne').innerHTML;
+        const idx  = compteur++;
+        const num  = document.querySelectorAll('.produit-row').length + 1;
+        const html = tpl.replaceAll('__IDX__', idx).replaceAll('__NUM__', num);
 
-    const wrap = document.createElement('div');
-    wrap.innerHTML = html;
-    document.getElementById('lignes-container').prepend(wrap.firstElementChild);
+        const wrap = document.createElement('div');
+        wrap.innerHTML = html;
+        document.getElementById('lignes-container').prepend(wrap.firstElementChild);
 
-    document.getElementById('empty-msg').style.display = 'none';
-    recalcTotal();
-}
-
-function supprimerLigne(btn) {
-    btn.closest('.produit-row').remove();
-    renuméroter();
-    const restant = document.querySelectorAll('.produit-row').length;
-    if (restant === 0) document.getElementById('empty-msg').style.display = '';
-    recalcTotal();
-}
-
-function renuméroter() {
-    document.querySelectorAll('.produit-row .num-ligne').forEach((el, i) => {
-        el.textContent = i + 1;
-    });
-}
-
-/* ─── Sélection d'un produit ─── */
-function onSelectProduit(sel) {
-    const row   = sel.closest('.produit-row');
-    const opt   = sel.selectedOptions[0];
-    const hint  = row.querySelector('.stock-hint');
-    const qteEl = row.querySelector('.input-qte');
-    const prixEl= row.querySelector('.input-prix');
-
-    if (!opt.value) {
-        hint.innerHTML = '';
-        prixEl.textContent = '—';
-        row.querySelector('.input-total').textContent = '0.00';
+        document.getElementById('empty-msg').style.display = 'none';
         recalcTotal();
-        return;
     }
 
-    const stock  = parseInt(opt.dataset.stock);
-    const prix   = parseFloat(opt.dataset.prix);
-    const statut = opt.dataset.statut;
-
-    // Afficher le stock disponible
-    const couleurs = { normal: '#059669', faible: '#d97706', rupture: '#dc2626' };
-    const icones   = { normal: '✓', faible: '⚠', rupture: '✗' };
-    hint.innerHTML = `<span style="color:${couleurs[statut]||'#64748b'};">
-        ${icones[statut]||''} Stock : <strong>${stock}</strong>
-    </span>`;
-
-    // Bloquer si rupture
-    if (stock === 0) {
-        qteEl.value    = 0;
-        qteEl.disabled = true;
-        qteEl.max      = 0;
-    } else {
-        qteEl.disabled = false;
-        qteEl.max      = stock;
-        qteEl.value    = Math.min(parseInt(qteEl.value) || 1, stock);
+    function supprimerLigne(btn) {
+        btn.closest('.produit-row').remove();
+        renuméroter();
+        const restant = document.querySelectorAll('.produit-row').length;
+        if (restant === 0) document.getElementById('empty-msg').style.display = '';
+        recalcTotal();
     }
 
-    prixEl.textContent = prix.toFixed(2);
-    recalcLigne(qteEl);
-}
+    function renuméroter() {
+        document.querySelectorAll('.produit-row .num-ligne').forEach((el, i) => {
+            el.textContent = i + 1;
+        });
+    }
 
-/* ─── Recalcul d'une ligne ─── */
-function recalcLigne(qteInput) {
-    const row   = qteInput.closest('.produit-row');
-    const sel   = row.querySelector('.select-produit');
-    const opt   = sel.selectedOptions[0];
-    const prix  = opt && opt.value ? parseFloat(opt.dataset.prix) : 0;
-    const qte   = parseFloat(qteInput.value) || 0;
-    row.querySelector('.input-total').textContent = (prix * qte).toFixed(2);
-    recalcTotal();
-}
+    /* ─── Sélection d'un produit ─── */
+    function onSelectProduit(sel) {
+        const row   = sel.closest('.produit-row');
+        const opt   = sel.selectedOptions[0];
+        const hint  = row.querySelector('.stock-hint');
+        const qteEl = row.querySelector('.input-qte');
+        const prixEl= row.querySelector('.input-prix');
 
-/* ─── Recalcul du récapitulatif ─── */
-function recalcTotal() {
-    let sousTot = 0;
-    document.querySelectorAll('.produit-row').forEach(row => {
-        sousTot += parseFloat(row.querySelector('.input-total').textContent) || 0;
+        if (!opt.value) {
+            hint.innerHTML = '';
+            prixEl.value = '0.00';
+            row.querySelector('.input-total').textContent = '0.00';
+            recalcTotal();
+            return;
+        }
+
+        const stock  = parseInt(opt.dataset.stock);
+        const prix   = parseFloat(opt.dataset.prix);
+        const statut = opt.dataset.statut;
+
+        // Afficher le stock disponible
+        const couleurs = { normal: '#059669', faible: '#d97706', rupture: '#dc2626' };
+        const icones   = { normal: '✓', faible: '⚠', rupture: '✗' };
+        hint.innerHTML = `<span style="color:${couleurs[statut]||'#64748b'};">
+            ${icones[statut]||''} Stock : <strong>${stock}</strong>
+        </span>`;
+
+        // Bloquer si rupture
+        if (stock === 0) {
+            qteEl.value    = 0;
+            qteEl.disabled = true;
+            qteEl.max      = 0;
+        } else {
+            qteEl.disabled = false;
+            qteEl.max      = stock;
+            qteEl.value    = Math.min(parseInt(qteEl.value) || 1, stock);
+        }
+
+        // prixEl.value = prix.toFixed(2);
+        if (!prixEl.value || parseFloat(prixEl.value) === 0) {
+            prixEl.value = prix.toFixed(2);
+        }
+
+        recalcLigne(qteEl);
+    }
+
+    /* ─── Recalcul d'une ligne ─── */
+    function recalcLigne(element) {
+
+        const row = element.closest('.produit-row');
+
+        const prix =
+            parseFloat(
+                row.querySelector('.input-prix').value
+            ) || 0;
+
+        const qte =
+            parseFloat(
+                row.querySelector('.input-qte').value
+            ) || 0;
+
+        row.querySelector('.input-total').textContent = (prix * qte).toFixed(2);
+
+        recalcTotal();
+    }
+
+    /* ─── Recalcul du récapitulatif ─── */
+    function recalcTotal() {
+        let sousTot = 0;
+        document.querySelectorAll('.produit-row').forEach(row => {
+            sousTot += parseFloat(row.querySelector('.input-total').textContent) || 0;
+        });
+
+        const charges = parseFloat(document.getElementById('charges').value) || 0;
+        const total   = sousTot + charges;
+        const nb      = document.querySelectorAll('.produit-row').length;
+
+        document.getElementById('recap-nb').textContent         = nb;
+        document.getElementById('recap-sous-total').textContent = sousTot.toFixed(2) + ' MAD';
+        document.getElementById('recap-charges').textContent    = charges.toFixed(2) + ' MAD';
+        document.getElementById('recap-total').textContent      = total.toFixed(2) + ' MAD';
+    }
+
+    // Init tooltips Bootstrap
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+            new bootstrap.Tooltip(el);
+        });
+        recalcTotal();
     });
-
-    const charges = parseFloat(document.getElementById('charges').value) || 0;
-    const total   = sousTot + charges;
-    const nb      = document.querySelectorAll('.produit-row').length;
-
-    document.getElementById('recap-nb').textContent         = nb;
-    document.getElementById('recap-sous-total').textContent = sousTot.toFixed(2) + ' MAD';
-    document.getElementById('recap-charges').textContent    = charges.toFixed(2) + ' MAD';
-    document.getElementById('recap-total').textContent      = total.toFixed(2) + ' MAD';
-}
-
-// Init tooltips Bootstrap
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
-        new bootstrap.Tooltip(el);
-    });
-    recalcTotal();
-});
 </script>
 @endpush

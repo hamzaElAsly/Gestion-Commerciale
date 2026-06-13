@@ -27,16 +27,6 @@
                     <input type="text" name="search" class="form-control form-control-sm" placeholder="Rechercher un produit..." value="{{ request('search') }}">
                 </div>
             </div>
-            {{-- <div class="col-md-3">
-                <select name="categorie" class="form-select form-select-sm">
-                    <option value="">Toutes les catégories</option>
-                    @foreach($categories as $cat)
-                        <option value="{{ $cat->id_categorie }}" {{ request('categorie') == $cat->id_categorie ? 'selected' : '' }}>
-                            {{ $cat->nom_categorie }}
-                        </option>
-                    @endforeach
-                </select>
-            </div> --}}
             <div class="col-md-2">
                 <select name="stock" class="form-select form-select-sm">
                     <option value="">Tout le stock</option>
@@ -86,8 +76,8 @@
                             {{ $produit->categorie->nom_categorie ?? '—' }}
                         </span>
                     </td> --}}
-                    <td class="text-end money">{{ number_format($produit->prix_unitaire,0) }} MAD</td>
-                    <td class="text-end money">{{ number_format($produit->prix_vente   ,0) }} MAD</td>
+                    <td class="text-end money">{{ number_format($produit->prix_unitaire,1) }} MAD</td>
+                    <td class="text-end money">{{ number_format($produit->prix_vente   ,1) }} MAD</td>
                     <td class="text-center">
                         <span class="fw-bold" style="font-size:15px;">{{ $produit->quantite_stock }}</span>
                     </td>

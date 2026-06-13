@@ -187,7 +187,10 @@
             </div>
             <div class="col-md-2">
                 <label class="form-label">Prix unit.</label>
-                <div class="form-control bg-light text-end money input-prix">—</div>
+                {{-- <div class="form-control bg-light text-end money input-prix">—</div> --}}
+                <input type="number" name="produits[__IDX__][prixVente]"
+                       class="form-control input-prix"
+                       min="0" step="0.01" value="0" oninput="recalcLigne(this)" required>
             </div>
             <div class="col-md-2">
                 <label class="form-label">Total</label>
@@ -213,22 +216,38 @@
 @push('scripts')
 <script>
 
-    const existingLines = {!! json_encode($existingLines) !!};
+    const existingLines = {!! json_encode(
+        $vente->details->map(function ($d) {
+            return [
+                'id_produit'  => $d->id_produit,
+                'nom_produit' => $d->nom_produit,
+                'quantite'    => $d->quantite,
+                'prix_vente'  => $d->prix_vente,
+                'prix_total'  => $d->prix_total,
+            ];
+        })->values()
+    ) !!};
 
     let compteur = 0;
 
-    /* ── Ajouter une ligne ── */
-    function ajouterLigne(idProduit = null, qte = 1) {
+    /* ───────────────────────────── */
+    /* Ajouter ligne */
+    /* ───────────────────────────── */
 
-        const tpl  = document.getElementById('tpl-ligne').innerHTML;
-        const idx  = compteur++;
-        const num  = document.querySelectorAll('.produit-row').length + 1;
+    function ajouterLigne(idProduit = null, qte = 1, prixVente = null)
+    {
+        const tpl = document.getElementById('tpl-ligne').innerHTML;
+
+        const idx = compteur++;
+
+        const num = document.querySelectorAll('.produit-row').length + 1;
 
         const html = tpl
             .replaceAll('__IDX__', idx)
             .replaceAll('__NUM__', num);
 
         const wrap = document.createElement('div');
+
         wrap.innerHTML = html;
 
         const row = wrap.firstElementChild;
@@ -247,18 +266,24 @@
 
             onSelectProduit(sel);
 
-            const qteEl = row.querySelector('.input-qte');
+            row.querySelector('.input-qte').value = qte;
 
-            qteEl.value = qte;
+            if (prixVente !== null) {
+                row.querySelector('.input-prix').value = prixVente;
+            }
 
-            recalcLigne(qteEl);
+            recalcLigne(row.querySelector('.input-qte'));
         }
 
         recalcTotal();
     }
 
-    function supprimerLigne(btn) {
+    /* ───────────────────────────── */
+    /* Supprimer ligne */
+    /* ───────────────────────────── */
 
+    function supprimerLigne(btn)
+    {
         btn.closest('.produit-row').remove();
 
         renumeroter();
@@ -270,29 +295,38 @@
         recalcTotal();
     }
 
-    function renumeroter() {
+    /* ───────────────────────────── */
 
+    function renumeroter()
+    {
         document
             .querySelectorAll('.produit-row .num-ligne')
             .forEach((el, i) => {
-
                 el.textContent = i + 1;
-
             });
     }
 
-    function onSelectProduit(sel) {
+    /* ───────────────────────────── */
+    /* Choix produit */
+    /* ───────────────────────────── */
 
-        const row    = sel.closest('.produit-row');
-        const opt    = sel.selectedOptions[0];
-        const hint   = row.querySelector('.stock-hint');
-        const qteEl  = row.querySelector('.input-qte');
+    function onSelectProduit(sel)
+    {
+        const row = sel.closest('.produit-row');
+
+        const opt = sel.selectedOptions[0];
+
+        const hint = row.querySelector('.stock-hint');
+
+        const qteEl = row.querySelector('.input-qte');
+
         const prixEl = row.querySelector('.input-prix');
 
         if (!opt.value) {
 
             hint.innerHTML = '';
-            prixEl.textContent = '—';
+
+            prixEl.value = '';
 
             row.querySelector('.input-total').textContent = '0.00';
 
@@ -301,8 +335,10 @@
             return;
         }
 
-        const stock  = parseInt(opt.dataset.stock);
-        const prix   = parseFloat(opt.dataset.prix);
+        const stock  = parseInt(opt.dataset.stock || 0);
+
+        const prix   = parseFloat(opt.dataset.prix || 0);
+
         const statut = opt.dataset.statut;
 
         const colors = {
@@ -317,11 +353,12 @@
             rupture: '✗'
         };
 
-        hint.innerHTML =
-            `<span style="color:${colors[statut]};">
+        hint.innerHTML = `
+            <span style="color:${colors[statut]};">
                 ${icons[statut]} Stock :
                 <strong>${stock}</strong>
-            </span>`;
+            </span>
+        `;
 
         if (stock === 0) {
 
@@ -340,25 +377,31 @@
             );
         }
 
-        prixEl.textContent = prix.toFixed(2);
+        /* remplir prix seulement si vide */
+        if (!prixEl.value || parseFloat(prixEl.value) === 0) {
+            prixEl.value = prix.toFixed(2);
+        }
 
-        recalcLigne(qteEl);
+        recalcLigne(prixEl);
     }
 
-    function recalcLigne(qteEl) {
+    /* ───────────────────────────── */
+    /* Calcul ligne */
+    /* ───────────────────────────── */
 
-        const row = qteEl.closest('.produit-row');
-
-        const sel = row.querySelector('.select-produit');
-
-        const opt = sel.selectedOptions[0];
+    function recalcLigne(element)
+    {
+        const row = element.closest('.produit-row');
 
         const prix =
-            opt && opt.value
-                ? parseFloat(opt.dataset.prix)
-                : 0;
+            parseFloat(
+                row.querySelector('.input-prix').value
+            ) || 0;
 
-        const qte = parseFloat(qteEl.value) || 0;
+        const qte =
+            parseFloat(
+                row.querySelector('.input-qte').value
+            ) || 0;
 
         row.querySelector('.input-total').textContent =
             (prix * qte).toFixed(2);
@@ -366,8 +409,12 @@
         recalcTotal();
     }
 
-    function recalcTotal() {
+    /* ───────────────────────────── */
+    /* Calcul total */
+    /* ───────────────────────────── */
 
+    function recalcTotal()
+    {
         let sousTot = 0;
 
         document
@@ -388,7 +435,8 @@
         const nb =
             document.querySelectorAll('.produit-row').length;
 
-        document.getElementById('recap-nb').textContent = nb;
+        document.getElementById('recap-nb').textContent =
+            nb;
 
         document.getElementById('recap-sous-total').textContent =
             sousTot.toFixed(2) + ' MAD';
@@ -399,6 +447,10 @@
         document.getElementById('recap-total').textContent =
             (sousTot + charges).toFixed(2) + ' MAD';
     }
+
+    /* ───────────────────────────── */
+    /* Initialisation */
+    /* ───────────────────────────── */
 
     document.addEventListener('DOMContentLoaded', () => {
 
@@ -412,7 +464,8 @@
 
                 ajouterLigne(
                     line.id_produit,
-                    line.quantite
+                    line.quantite,
+                    line.prix_vente
                 );
 
             });
