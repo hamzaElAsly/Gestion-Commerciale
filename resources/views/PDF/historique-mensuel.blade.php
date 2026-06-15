@@ -145,7 +145,8 @@
 
             <!-- ✅ REMARQUE -->
             <td class="muted" style="font-size:10px;">
-                {{ $h->remarque ? \Illuminate\Support\Str::limit($h->remarque, 40) : '—' }}
+                {{ $h->remarque }}
+                {{-- {{ $h->remarque ? \Illuminate\Support\Str::limit($h->remarque, 40) : '—' }} --}}
             </td>
 
             <!-- ✅ CHARGES -->
@@ -173,7 +174,7 @@
             <td colspan="6" class="text-right">
                 TOTAL {{ strtoupper($nomMois) }} {{ $annee }} :
             </td>
-            <td class="text-right money" style="color:#1a56db;font-size:14px;">
+            <td colspan="2" class="text-center money" style="color:#1a56db;font-size:14px;">
                 {{ number_format($totalMois, 2) }} MAD
             </td>
             <td></td>
@@ -210,8 +211,12 @@
     @endif
 
     <div class="footer">
-        <div>GestPro — Gestion Commerciale Professionnelle | Rapport généré automatiquement</div>
         <div>Ce document est confidentiel — {{ ucfirst($nomMois) }} {{ $annee }}</div>
+        <div style="margin-top: 4px;">
+            1 RUE 1 HY SIDI HADI ZOUAGHA RCE NOUR MAG 2 30000 SECTEUR 0502 FES <br>
+                **TEL 06 22 39 00 28***IF68334179***ICE003778507000061 <br>
+                        COMPTE BANQUER 011270000023210000549604
+        </div>
     </div>
 
 </div>
