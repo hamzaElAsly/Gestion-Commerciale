@@ -58,34 +58,72 @@
 </div>
 
 <!-- Statistiques du mois -->
-<div class="row g-3 mb-4">
-    <div class="col-md-4">
-        <div class="stat-card">
-            <div class="stat-icon blue"><i class="bi bi-calendar-check"></i></div>
-            <div>
-                <div class="stat-value">{{ $historiques->count() }}</div>
-                <div class="stat-label">Services ce mois</div>
+<div class="container-fluid mb-4">
+
+    <!-- Ligne 1 -->
+    <div class="row g-3 mb-2 d-flex justify-content-center">
+        <div class="col-md-4">
+            <div class="stat-card h-100">
+                <div class="stat-icon blue"><i class="bi bi-calendar-check"></i></div>
+                <div>
+                    <div class="stat-value">{{ $historiques->count() }}</div>
+                    <div class="stat-label">Services ce mois</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card h-100">
+                <div class="stat-icon purple"><i class="bi bi-people"></i></div>
+                <div>
+                    <div class="stat-value">{{ $historiques->unique('id_client')->count() }}</div>
+                    <div class="stat-label">Clients servis</div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="stat-card">
-            <div class="stat-icon green"><i class="bi bi-currency-dollar"></i></div>
-            <div>
-                <div class="stat-value" style="font-size:20px;">{{ number_format($totalMois, 2) }}</div>
-                <div class="stat-label">CA Total (MAD)</div>
+
+    <!-- Ligne 2 -->
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="stat-card h-100">
+                <div class="stat-icon green"><i class="bi bi-graph-up-arrow"></i></div>
+                <div>
+                    <div class="stat-value" style="font-size:20px;">{{ number_format($totalVenteMois, 2) }}</div>
+                    <div class="stat-label">CA Total (MAD)</div>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-4">
-        <div class="stat-card">
-            <div class="stat-icon purple"><i class="bi bi-people"></i></div>
-            <div>
-                <div class="stat-value">{{ $historiques->unique('id_client')->count() }}</div>
-                <div class="stat-label">Clients servis</div>
+
+        <div class="col-md-4">
+            <div class="stat-card h-100">
+                <div class="stat-icon orange">
+                    <i class="bi bi-cart-dash"></i>
+                </div>
+                <div>
+                    <div class="stat-value" style="font-size:20px;">
+                        {{ number_format($totalAchatMois, 2) }}
+                    </div>
+                    <div class="stat-label">Coût Total (MAD)</div>
+                </div>
             </div>
         </div>
+
+        <div class="col-md-4">
+            <div class="stat-card h-100">
+                <div class="stat-icon success">
+                    <i class="bi bi-cash-stack"></i>
+                </div>
+                <div>
+                    <div class="stat-value" style="font-size:20px;">
+                        {{ number_format($totalVenteMois - $totalAchatMois, 2) }}
+                    </div>
+                    <div class="stat-label">Profit (MAD)</div>
+                </div>
+            </div>
+        </div>
+
     </div>
+
 </div>
 
 <div class="card">
@@ -143,7 +181,7 @@
                 <tr style="background: #f8fafc;">
                     <td colspan="5" class="text-end fw-bold">TOTAL DU MOIS :</td>
                     <td class="text-end money fw-bold text-primary" style="font-size:16px;">
-                        {{ number_format($totalMois, 2) }} MAD
+                        {{ number_format($totalVenteMois, 2) }} MAD
                     </td>
                     <td></td>
                 </tr>

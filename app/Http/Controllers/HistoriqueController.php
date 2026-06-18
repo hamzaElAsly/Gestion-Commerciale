@@ -287,26 +287,26 @@ class HistoriqueController extends Controller
             ->whereYear('date_service', $annee)
             ->orderBy('date_service');
 
-        if ($idClient) {
-            $query->where('id_client', $idClient);
-        }
+        if ($idClient) {$query->where('id_client', $idClient);}
 
         $historiques = $query->get();
-        $totalMois = $historiques->sum('montant_total');
-        $nomMois = \Carbon\Carbon::create()->month($mois)->locale('fr')->monthName;
-        $clients = Client::orderBy('nom')->get();
+        $totalVenteMois = $historiques->sum('montant_total');
+        $totalAchatMois = DetailHistorique::join('historiques','detail_historiques.id_historique','=','historiques.id_historique')
+            ->join('produits','detail_historiques.id_produit','=','produits.id_produit')
+            ->whereMonth('historiques.date_service', $mois)
+            ->whereYear('historiques.date_service', $annee)
+            ->when($idClient, function ($query) use ($idClient) {$query->where('historiques.id_client', $idClient);})
+            ->sum(DB::raw('detail_historiques.quantite_utilisee * produits.prix_unitaire'));
+                $nomMois = \Carbon\Carbon::create()->month($mois)->locale('fr')->monthName;
+                $clients = Client::orderBy('nom')->get();
 
-        if ($request->has('export_pdf')) {
-            $pdf = Pdf::loadView('pdf.historique-mensuel', compact(
-                'historiques', 'totalMois', 'nomMois', 'annee', 'mois'
-            ))->setPaper('a4', 'portrait');
-            return $pdf->download("historique-{$nomMois}-{$annee}.pdf");
-        }
-
-        return view('historique.mensuel', compact(
-            'historiques', 'totalMois', 'nomMois', 'annee', 'mois', 'clients'
-        ));
-    }
+                if ($request->has('export_pdf')) {
+                    $pdf = Pdf::loadView('pdf.historique-mensuel', compact('historiques', 'totalVenteMois', 'nomMois', 'annee', 'mois', 'totalAchatMois'))
+                                        ->setPaper('a4', 'portrait');
+                    return $pdf->download("historique-{$nomMois}-{$annee}.pdf");
+                }
+                return view('historique.mensuel', compact( 'historiques', 'totalVenteMois', 'nomMois', 'annee', 'mois', 'clients', 'totalAchatMois'));
+            }
 
     public function getProduitInfo(Produit $produit)
     {
