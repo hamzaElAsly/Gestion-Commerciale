@@ -300,13 +300,13 @@ class HistoriqueController extends Controller
                 $nomMois = \Carbon\Carbon::create()->month($mois)->locale('fr')->monthName;
                 $clients = Client::orderBy('nom')->get();
 
-                if ($request->has('export_pdf')) {
-                    $pdf = Pdf::loadView('pdf.historique-mensuel', compact('historiques', 'totalVenteMois', 'nomMois', 'annee', 'mois', 'totalAchatMois'))
-                                        ->setPaper('a4', 'portrait');
-                    return $pdf->download("historique-{$nomMois}-{$annee}.pdf");
-                }
-                return view('historique.mensuel', compact( 'historiques', 'totalVenteMois', 'nomMois', 'annee', 'mois', 'clients', 'totalAchatMois'));
-            }
+        if ($request->has('export_pdf')) {
+            $pdf = Pdf::loadView('pdf.historique-mensuel', compact('historiques', 'totalVenteMois', 'nomMois', 'annee', 'mois', 'totalAchatMois'))
+                        ->setPaper('a4', 'portrait');
+            return $pdf->download("historique-{$nomMois}-{$annee}.pdf");
+        }
+        return view('historique.mensuel', compact( 'historiques', 'totalVenteMois', 'nomMois', 'annee', 'mois', 'clients', 'totalAchatMois'));
+    }
 
     public function getProduitInfo(Produit $produit)
     {

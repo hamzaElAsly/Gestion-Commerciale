@@ -97,7 +97,7 @@
             <div class="stat-label">Services réalisés</div>
         </div>
         <div class="stat-box">
-            <div class="stat-value" style="font-size:16px;">{{ number_format($totalMois, 2) }}</div>
+            <div class="stat-value" style="font-size:16px;">{{ number_format($totalVenteMois, 2) }}</div>
             <div class="stat-label">CA Total (MAD)</div>
         </div>
         <div class="stat-box">
@@ -175,7 +175,7 @@
                 TOTAL {{ strtoupper($nomMois) }} {{ $annee }} :
             </td>
             <td colspan="2" class="text-center money" style="color:#1a56db;font-size:14px;">
-                {{ number_format($totalMois, 2) }} MAD
+                {{ number_format($totalVenteMois, 2) }} MAD
             </td>
             <td></td>
         </tr>
