@@ -10,7 +10,6 @@ class NoteController extends Controller
     public function index()
     {
         $notes = Note::latest()->paginate(10);
-
         return view('note.index', compact('notes'));
     }
 
@@ -29,22 +28,18 @@ class NoteController extends Controller
 
         Note::create($validated);
 
-        return redirect()
-            ->route('note.index')
-            ->with('success', 'Note ajoutée avec succès.');
+        return redirect()->route('note.index')->with('success', 'Note ajoutée avec succès.');
     }
 
     public function show(string $id)
     {
         $note = Note::findOrFail($id);
-
         return view('note.show', compact('note'));
     }
 
     public function edit(string $id)
     {
         $note = Note::findOrFail($id);
-
         return view('note.edit', compact('note'));
     }
 
@@ -59,9 +54,7 @@ class NoteController extends Controller
         $note = Note::findOrFail($id);
         $note->update($validated);
 
-        return redirect()
-            ->route('note.index')
-            ->with('success', 'Note modifiée avec succès.');
+        return redirect()->route('note.index')->with('success', 'Note modifiée avec succès.');
     }
 
     public function destroy(string $id)
@@ -69,8 +62,6 @@ class NoteController extends Controller
         $note = Note::findOrFail($id);
         $note->delete();
 
-        return redirect()
-            ->route('note.index')
-            ->with('success', 'Note supprimée avec succès.');
+        return redirect()->route('note.index')->with('success', 'Note supprimée avec succès.');
     }
 }

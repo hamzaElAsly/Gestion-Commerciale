@@ -514,6 +514,10 @@
                 <i class="bi bi-tags-fill"></i> Ventes
             </a>
 
+            <a href="{{ route('note.index') }}" class="nav-link {{ request()->routeIs('note.*') ? 'active' : '' }}">
+                <i class="bi bi-journal-plus"></i> Notes
+            </a>
+
             <div class="nav-section-title">Stock</div>
 
             <a href="{{ route('stock.etat') }}" class="nav-link {{ request()->routeIs('stock.etat') ? 'active' : '' }}">
