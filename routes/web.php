@@ -8,6 +8,7 @@ use App\Http\Controllers\ProduitController;
 use App\Http\Controllers\HistoriqueController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\DevisController;
+use App\Http\Controllers\NoteController;
 use App\Http\Controllers\VenteController;
 
 /*
@@ -27,6 +28,8 @@ Route::middleware(['auth'])->group(function () {
 
     // Clients
     Route::resource('clients', ClientController::class);
+    // Notes
+    Route::resource('note', NoteController::class);
 
     // Catégories
     Route::resource('categories', CategorieController::class)->except(['show']);
