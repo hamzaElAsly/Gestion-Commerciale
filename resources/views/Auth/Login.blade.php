@@ -173,19 +173,6 @@
             Se connecter
         </button>
     </form>
-
-    <div class="divider">ou</div>
-    <div class="link-row">
-        Pas encore de compte ? <a href="{{ route('register') }}">Créer un compte</a>
-    </div>
-
-    {{-- <div class="demo-card">
-        <div class="dct"><i class="bi bi-shield-check-fill"></i> Compte démo</div>
-        <div class="dcr">
-            <span><strong>Email :</strong> admin@gestpro.ma</span>
-            <span><strong>Mot de passe :</strong> password</span>
-        </div>
-    </div> --}}
 </div>
 
 <script>
