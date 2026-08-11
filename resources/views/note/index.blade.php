@@ -93,10 +93,6 @@
 
                 {{-- Actions --}}
                 <div class="d-flex gap-1 align-items-center" style="flex-shrink:0;">
-                    <a href="{{ route('note.show', $note->id_note) }}"
-                       class="btn btn-sm btn-light" title="Voir">
-                        <i class="bi bi-eye"></i>
-                    </a>
                     <a href="{{ route('note.edit', $note->id_note) }}"
                        class="btn btn-sm btn-light" title="Modifier">
                         <i class="bi bi-pencil"></i>

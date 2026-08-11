@@ -31,11 +31,11 @@ class NoteController extends Controller
         return redirect()->route('note.index')->with('success', 'Note ajoutée avec succès.');
     }
 
-    public function show(string $id)
-    {
-        $note = Note::findOrFail($id);
-        return view('note.show', compact('note'));
-    }
+    // public function show(string $id)
+    // {
+    //     $note = Note::findOrFail($id);
+    //     return view('note.show', compact('note'));
+    // }
 
     public function edit(string $id)
     {

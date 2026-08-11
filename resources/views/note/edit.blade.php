@@ -16,10 +16,8 @@
                 <li class="breadcrumb-item">
                     <a href="{{ route('note.index') }}" class="text-muted">Notes</a>
                 </li>
-                <li class="breadcrumb-item">
-                    <a href="{{ route('note.show', $note->id_note) }}" class="text-muted">
-                        {{ \Illuminate\Support\Str::limit($note->title, 30) }}
-                    </a>
+                <li class="breadcrumb-item text-muted">
+                    {{ \Illuminate\Support\Str::limit($note->title, 30) }}
                 </li>
                 <li class="breadcrumb-item active text-muted">Modifier</li>
             </ol>
@@ -27,9 +25,6 @@
     </div>
     {{-- Actions rapides --}}
     <div class="d-flex gap-2">
-        <a href="{{ route('note.show', $note->id_note) }}" class="btn btn-light btn-sm">
-            <i class="bi bi-eye me-1"></i>Voir
-        </a>
         <form method="POST" action="{{ route('note.destroy', $note->id_note) }}"
               onsubmit="return confirm('Supprimer définitivement cette note ?')">
             @csrf @method('DELETE')

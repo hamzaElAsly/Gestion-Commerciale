@@ -157,19 +157,33 @@
         }
 
         /* ===== TOPBAR ===== */
-        .topbar {
+        .topbar{
             position: fixed;
             top: 0;
-            left: var(--sidebar-width);
+            left: 260px;
             right: 0;
-            height: var(--topbar-height);
-            background: white;
-            border-bottom: 1px solid #e2e8f0;
-            z-index: 900;
+            height: 70px;
+            background: #fff;
+            border-bottom: 1px solid #e5e7eb;
             display: flex;
             align-items: center;
-            padding: 0 28px;
-            gap: 16px;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 1100;
+        }
+        .sidebar-overlay{
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.35);
+            opacity: 0;
+            visibility: hidden;
+            transition: .3s;
+            z-index: 1040;
+        }
+
+        .sidebar-overlay.show{
+            opacity: 1;
+            visibility: visible;
         }
 
         .topbar-title {
@@ -429,7 +443,7 @@
         /* ===== RESPONSIVE ===== */
         @media (max-width: 991px) {
             .sidebar { transform: translateX(-100%); }
-            .sidebar.open { transform: translateX(0); }
+            .sidebar.open { transform: translateX(0); padding-top: var(--topbar-height);}
             .topbar { left: 0; }
             .main-content { margin-left: 0; }
         }
@@ -480,7 +494,6 @@
                 {{-- <div class="brand-sub">Ste. CHARRAK TECHNOLOGY</div> --}}
             </div>
         </div>
-
         <div class="sidebar-nav">
             <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 <i class="bi bi-grid-1x2-fill"></i> Tableau de bord
@@ -549,15 +562,17 @@
             </form>
         </div>
     </nav>
-
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <!-- ===== TOPBAR ===== -->
     <header class="topbar">
-        <button class="btn btn-sm btn-light d-lg-none" onclick="document.getElementById('sidebar').classList.toggle('open')">
-            <i class="bi bi-list" style="font-size: 18px;"></i>
-        </button>
+        <div class="sidebar-header d-lg-none">
+            <button class="btn btn-sm btn-light" onclick="document.getElementById('sidebar').classList.toggle('open')">
+                <i class="bi bi-list" style="font-size: 18px;"></i>
+            </button>
+        </div>
 
-        <div class="topbar-title">@yield('page-title', 'Tableau de bord')</div>
-
+        {{-- <div class="topbar-title">@yield('page-title', 'Tableau de bord')</div> --}}
+        <div class="topbar-title"></div>
         <div class="topbar-actions">
             @php $produitsAlerte = \App\Models\Produit::stockFaible()->count(); @endphp
             @if($produitsAlerte > 0)

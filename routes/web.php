@@ -28,6 +28,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Clients
     Route::resource('clients', ClientController::class);
+    
     // Notes
     Route::resource('note', NoteController::class);
 
