@@ -1,14 +1,14 @@
 @extends('layouts.app')
-@section('title', 'Rapport Mensuel')
-@section('page-title', 'Rapport Mensuel')
+@section('title', $titreRapport)
+@section('page-title', 'Rapport des Services')
 
 @section('content')
 <div class="page-header">
     <div>
-        <h1>Rapport Mensuel</h1>
+        <h1>{{ $titreRapport }}</h1>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item active text-muted">{{ ucfirst($nomMois) }} {{ $annee }}</li>
+                <li class="breadcrumb-item active text-muted">{{ $titreRapport }}</li>
             </ol>
         </nav>
     </div>
@@ -21,22 +21,29 @@
 <div class="card mb-4">
     <div class="card-body py-3">
         <form method="GET" class="row g-2 align-items-end">
-            <div class="col-md-3">
+            <div class="col-md-2">
+                <label class="form-label">Année</label>
+                <select name="annee" class="form-select form-select-sm" required>
+                    @for($y = now()->year + 1; $y >= now()->year - 5; $y--)
+                        <option value="{{ $y }}" {{ $annee == $y ? 'selected' : '' }}>{{ $y }}</option>
+                    @endfor
+                </select>
+            </div>
+            <div class="col-md-2">
                 <label class="form-label">Mois</label>
-                <select name="mois" class="form-select form-select-sm">
+                <select name="mois" id="rapport-mois" class="form-select form-select-sm">
+                    <option value="">Tous les mois</option>
                     @for($m = 1; $m <= 12; $m++)
-                        <option value="{{ $m }}" {{ $mois == $m ? 'selected' : '' }}>
+                        <option value="{{ $m }}" {{ (int) $mois === $m ? 'selected' : '' }}>
                             {{ \Carbon\Carbon::create()->month($m)->locale('fr')->monthName }}
                         </option>
                     @endfor
                 </select>
             </div>
             <div class="col-md-2">
-                <label class="form-label">Année</label>
-                <select name="annee" class="form-select form-select-sm">
-                    @for($y = now()->year; $y >= now()->year - 3; $y--)
-                        <option value="{{ $y }}" {{ $annee == $y ? 'selected' : '' }}>{{ $y }}</option>
-                    @endfor
+                <label class="form-label">Jour</label>
+                <select name="jour" id="rapport-jour" class="form-select form-select-sm" data-selected="{{ $jour }}">
+                    <option value="">Tous les jours</option>
                 </select>
             </div>
             <div class="col-md-3">
@@ -44,7 +51,7 @@
                 <select name="id_client" class="form-select form-select-sm">
                     <option value="">Tous les clients</option>
                     @foreach($clients as $c)
-                        <option value="{{ $c->id_client }}" {{ request('id_client') == $c->id_client ? 'selected' : '' }}>
+                        <option value="{{ $c->id_client }}" {{ (string) $idClient === (string) $c->id_client ? 'selected' : '' }}>
                             {{ $c->nom }}
                         </option>
                     @endforeach
@@ -67,7 +74,7 @@
                 <div class="stat-icon blue"><i class="bi bi-calendar-check"></i></div>
                 <div>
                     <div class="stat-value">{{ $historiques->count() }}</div>
-                    <div class="stat-label">Services ce mois</div>
+                    <div class="stat-label">Services filtrés</div>
                 </div>
             </div>
         </div>
@@ -89,7 +96,8 @@
                 <div class="stat-icon green"><i class="bi bi-graph-up-arrow"></i></div>
                 <div>
                     <div class="stat-value" style="font-size:20px;">{{ number_format($totalVenteMois, 2) }}</div>
-                    <div class="stat-label">CA Total (MAD)</div>
+                    <div class="stat-label">CA TTC (MAD)</div>
+                    <small class="text-muted">HT {{ number_format($totalHt, 2) }} · TVA {{ number_format($totalTva, 2) }}</small>
                 </div>
             </div>
         </div>
@@ -129,7 +137,7 @@
 <div class="card">
     <div class="card-header">
         <i class="bi bi-table me-2 text-primary"></i>
-        Services de <strong>{{ ucfirst($nomMois) }} {{ $annee }}</strong>
+        <strong>{{ $titreRapport }}</strong>
         — {{ $historiques->count() }} enregistrement(s)
     </div>
     <div class="table-responsive">
@@ -171,7 +179,7 @@
                 <tr>
                     <td colspan="7" class="text-center text-muted py-5">
                         <i class="bi bi-calendar-x" style="font-size:2.5rem;display:block;opacity:.3;margin-bottom:10px;"></i>
-                        Aucun service pour {{ $nomMois }} {{ $annee }}.
+                        Aucun service pour la période sélectionnée.
                     </td>
                 </tr>
                 @endforelse
@@ -179,7 +187,7 @@
             @if($historiques->count() > 0)
             <tfoot>
                 <tr style="background: #f8fafc;">
-                    <td colspan="5" class="text-end fw-bold">TOTAL DU MOIS :</td>
+                    <td colspan="5" class="text-end fw-bold">TOTAL TTC :</td>
                     <td class="text-end money fw-bold text-primary" style="font-size:16px;">
                         {{ number_format($totalVenteMois, 2) }} MAD
                     </td>
@@ -191,3 +199,30 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    function mettreAJourJoursRapport() {
+        const mois = document.getElementById('rapport-mois');
+        const jour = document.getElementById('rapport-jour');
+        const annee = document.querySelector('select[name="annee"]');
+        const selection = jour.dataset.selected || jour.value;
+        jour.innerHTML = '<option value="">Tous les jours</option>';
+        if (!mois.value) {
+            jour.disabled = true;
+            jour.value = '';
+            return;
+        }
+        jour.disabled = false;
+        const nombreJours = new Date(Number(annee.value), Number(mois.value), 0).getDate();
+        for (let numero = 1; numero <= nombreJours; numero++) {
+            const option = new Option(numero, numero, false, String(numero) === String(selection));
+            jour.add(option);
+        }
+        jour.dataset.selected = '';
+    }
+    document.getElementById('rapport-mois').addEventListener('change', mettreAJourJoursRapport);
+    document.querySelector('select[name="annee"]').addEventListener('change', mettreAJourJoursRapport);
+    document.addEventListener('DOMContentLoaded', mettreAJourJoursRapport);
+</script>
+@endpush

@@ -75,8 +75,10 @@
                     <span class="text-muted">Nombre de produits :</span>
                     <span class="fw-bold" id="recap-nb-produits">0</span>
                 </div>
+                <div class="d-flex justify-content-between"><span class="text-muted">Total HT :</span><span class="fw-bold money" id="recap-ht">0.00 MAD</span></div>
+                <div class="d-flex justify-content-between"><span class="text-muted">TVA (<span id="recap-taux-tva">0.00</span> %) :</span><span class="fw-bold money" id="recap-tva">0.00 MAD</span></div>
                 <div class="d-flex justify-content-between mb-3">
-                    <span class="text-muted">Montant total :</span>
+                    <span class="text-muted">Total TTC :</span>
                     <span class="fw-bold text-primary money" id="recap-total">0.00 MAD</span>
                 </div>
                 <hr>
@@ -92,9 +94,18 @@
         <div class="card mb-4">
             <div class="card-header d-flex align-items-center justify-content-between">
                 <span><i class="bi bi-box-seam-fill me-2 text-primary"></i>Frais de Service (MAD)</span>
-                <input type="number" name="charges" class="form-control w-50 @error('charges') is-invalid @enderror"
-                    value="{{ old('charges', 0) }}" min="0" step="0.01">
+                <input type="number" id="charges" name="charges" class="form-control w-50 @error('charges') is-invalid @enderror"
+                    value="{{ old('charges', 0) }}" min="0" step="0.01" oninput="mettreAJourRecap()">
                 @error('charges')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <span><i class="bi bi-percent me-2 text-primary"></i>TVA (%)</span>
+                <input type="number" id="tva" name="tva" class="form-control w-50 @error('tva') is-invalid @enderror"
+                    value="{{ old('tva', 0) }}" min="0" max="100" step="0.01" oninput="mettreAJourRecap()">
+                @error('tva')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
         </div>
 
@@ -249,15 +260,21 @@
 
     function mettreAJourRecap() {
         const rows = document.querySelectorAll('.produit-row');
-        let grandTotal = 0;
+        let totalProduits = 0;
         
         rows.forEach(row => {
             const val = parseFloat(row.querySelector('.ligne-total').textContent) || 0;
-            grandTotal += val;
+            totalProduits += val;
         });
-        
+        const charges = parseFloat(document.getElementById('charges').value) || 0;
+        const tva = parseFloat(document.getElementById('tva').value) || 0;
+        const totalHt = totalProduits + charges;
+        const montantTva = totalHt * tva / 100;
         document.getElementById('recap-nb-produits').textContent = rows.length;
-        document.getElementById('recap-total').textContent = grandTotal.toFixed(2) + ' MAD';
+        document.getElementById('recap-ht').textContent = totalHt.toFixed(2) + ' MAD';
+        document.getElementById('recap-taux-tva').textContent = tva.toFixed(2);
+        document.getElementById('recap-tva').textContent = montantTva.toFixed(2) + ' MAD';
+        document.getElementById('recap-total').textContent = (totalHt + montantTva).toFixed(2) + ' MAD';
     }
 
     // Ajouter une ligne par défaut

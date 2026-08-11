@@ -29,4 +29,14 @@ class Devis extends Model
     public function details() {
         return $this->hasMany(DetailDevis::class, 'id_devis');
     }
+
+    public function getTotalHtAttribute(): float
+    {
+        return (float) $this->details->sum('prix_total');
+    }
+
+    public function getMontantTvaAttribute(): float
+    {
+        return round($this->total_ht * (float) $this->tva / 100, 2);
+    }
 }

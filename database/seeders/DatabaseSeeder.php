@@ -108,7 +108,7 @@ class DatabaseSeeder extends Seeder
                 $dateService = now()->subDays($jours)->setTime(10, 0);
                 $historique = Historique::updateOrCreate(
                     ['id_client' => $clients[$clientNom]->id_client, 'remarque' => $remarque],
-                    ['date_service' => $dateService, 'charges' => $charges, 'montant_total' => 0, 'statut' => 'termine']
+                    ['date_service' => $dateService, 'charges' => $charges, 'tva' => 0, 'montant_total' => 0, 'statut' => 'termine']
                 );
 
                 $historique->details()->delete();

@@ -250,8 +250,16 @@
     <div style="display: table; width: 100%;">
         <div style="display: table-cell; width: 45%; vertical-align: top; padding-left: 20px;">
             <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
+                <div class="total-row">
+                    <div class="total-label">Total HT :</div>
+                    <div class="total-value">{{ number_format($devis->total_ht, 2) }} MAD</div>
+                </div>
+                <div class="total-row">
+                    <div class="total-label">TVA ({{ number_format($devis->tva, 2) }} %) :</div>
+                    <div class="total-value">{{ number_format($devis->montant_tva, 2) }} MAD</div>
+                </div>
                 <div style="background: #1a56db; color: white; padding: 12px; border-radius: 6px; display: table; width: 100%; margin-top: 8px;">
-                    <div style="display: table-cell; font-size: 13px; font-weight: bold;">TOTAL À PAYER</div>
+                    <div style="display: table-cell; font-size: 13px; font-weight: bold;">TOTAL TTC</div>
                     <div style="display: table-cell; text-align: right; font-size: 18px; font-weight: bold; font-family: monospace;">
                         {{ number_format($devis->montant_total, 2) }} MAD
                     </div>

@@ -63,9 +63,10 @@
                 </div>
 
                 <div class="card mt-3">
-                    <div class="card-body d-flex justify-content-between">
-                        <strong>Total Produits:</strong>
-                        <span id="recap-total">{{ $historique->montant_total }} MAD</span>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between"><strong>Total HT :</strong><span id="recap-ht">0.00 MAD</span></div>
+                        <div class="d-flex justify-content-between"><strong>TVA (<span id="recap-taux-tva">0.00</span> %) :</strong><span id="recap-tva">0.00 MAD</span></div>
+                        <div class="d-flex justify-content-between text-primary"><strong>Total TTC :</strong><span id="recap-total">{{ $historique->montant_total }} MAD</span></div>
                     </div>
                 </div>
             </div>
@@ -89,10 +90,18 @@
             <div class="card-header d-flex align-items-center justify-content-between">
                 <span><i class="bi bi-box-seam-fill me-2 text-primary"></i>Frais de Service (MAD)</span>
                 <input type="number" class="form-control form-control-sm w-auto" value="{{ old('charges', $historique->charges) }}"
-                name="charges" id="search-produit" placeholder="Frais de Service ...">
+                name="charges" id="charges" min="0" step="0.01" placeholder="Frais de Service ...">
                 @error('charges')
                     <div class="alert alert-danger mt-2">{{ $message }}</div>
                 @enderror
+            </div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <span><i class="bi bi-percent me-2 text-primary"></i>TVA (%)</span>
+                <input type="number" class="form-control form-control-sm w-auto @error('tva') is-invalid @enderror"
+                    value="{{ old('tva', $historique->tva ?? 0) }}" name="tva" id="tva" min="0" max="100" step="0.01">
+                @error('tva')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
         </div>
         <div class="card">
@@ -228,8 +237,14 @@
         document.querySelectorAll('.prix-total').forEach(input => {
             total += parseFloat(input.value || 0);
         });
-        let montantTotal = total + parseFloat(document.querySelector('input[name="charges"]').value || 0);
-        document.getElementById('recap-total').textContent = montantTotal.toFixed(2);
+        const charges = parseFloat(document.getElementById('charges').value) || 0;
+        const tva = parseFloat(document.getElementById('tva').value) || 0;
+        const totalHt = total + charges;
+        const montantTva = totalHt * tva / 100;
+        document.getElementById('recap-ht').textContent = totalHt.toFixed(2) + ' MAD';
+        document.getElementById('recap-taux-tva').textContent = tva.toFixed(2);
+        document.getElementById('recap-tva').textContent = montantTva.toFixed(2) + ' MAD';
+        document.getElementById('recap-total').textContent = (totalHt + montantTva).toFixed(2) + ' MAD';
     }
 
     // ================== ADD PRODUIT ==================
@@ -261,6 +276,9 @@
             if (row) updateRow(row);
         }
     });
+
+    document.getElementById('charges').addEventListener('input', mettreAJourRecap);
+    document.getElementById('tva').addEventListener('input', mettreAJourRecap);
 
     // supprimer produit
     document.addEventListener('click', function(e){

@@ -271,19 +271,19 @@
         <div style="display: table-cell; width: 45%; vertical-align: top; padding-left: 20px;">
             <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
                 <div style="display: table; width: 100%; padding: 6px 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 6px;">
-                    <div style="display: table-cell; color: #64748b; font-size: 12px;">Sous-total :</div>
+                    <div style="display: table-cell; color: #64748b; font-size: 12px;">Total HT :</div>
                     <div style="display: table-cell; text-align: right; font-size: 12px; font-weight: bold; font-family: monospace;">
-                        {{ number_format($historique->montant_total, 2) }} MAD
+                        {{ number_format($historique->total_ht, 2) }} MAD
                     </div>
                 </div>
                 <div style="display: table; width: 100%; padding: 6px 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 6px;">
-                    <div style="display: table-cell; color: #64748b; font-size: 12px;">TVA (0%) :</div>
+                    <div style="display: table-cell; color: #64748b; font-size: 12px;">TVA ({{ number_format($historique->tva, 2) }} %) :</div>
                     <div style="display: table-cell; text-align: right; font-size: 12px; font-family: monospace;">
-                        {{ number_format($historique->montant_total * 0.0, 2) }} MAD
+                        {{ number_format($historique->montant_tva, 2) }} MAD
                     </div>
                 </div>
                 <div style="background: #1a56db; color: white; padding: 12px; border-radius: 6px; display: table; width: 100%; margin-top: 8px;">
-                    <div style="display: table-cell; font-size: 13px; font-weight: bold;">TOTAL À PAYER</div>
+                    <div style="display: table-cell; font-size: 13px; font-weight: bold;">TOTAL TTC</div>
                     <div style="display: table-cell; text-align: right; font-size: 18px; font-weight: bold; font-family: monospace;">
                         {{ number_format($historique->montant_total, 2) }} MAD
                     </div>

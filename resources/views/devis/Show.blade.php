@@ -64,7 +64,9 @@
 
         <!-- TOTAL -->
         <div class="card p-3 mt-3 text-end">
-            <h4>Total : <span class="text-success">{{ number_format($devis->montant_total, 2) }} MAD</span></h4>
+            <div>Total HT : <strong>{{ number_format($devis->total_ht, 2) }} MAD</strong></div>
+            <div>TVA ({{ number_format($devis->tva, 2) }} %) : <strong>{{ number_format($devis->montant_tva, 2) }} MAD</strong></div>
+            <h4>Total TTC : <span class="text-success">{{ number_format($devis->montant_total, 2) }} MAD</span></h4>
         </div>
     </div>
 </div>

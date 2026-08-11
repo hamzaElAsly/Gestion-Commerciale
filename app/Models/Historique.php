@@ -16,6 +16,7 @@ class Historique extends Model
         'id_client',
         'date_service',
         'charges',
+        'tva',
         'montant_total',
         'remarque',
         'statut',
@@ -25,6 +26,7 @@ class Historique extends Model
         'date_service' => 'datetime',
         'montant_total' => 'decimal:2',
         'charges' => 'decimal:2',
+        'tva' => 'decimal:2',
     ];
 
     public function client()
@@ -44,8 +46,18 @@ class Historique extends Model
 
     public function recalculerMontant(): void
     {
-        $total = $this->details()->sum('prix_total');
-        $this->update(['montant_total' => $total]);
+        $totalHt = (float) $this->details()->sum('prix_total') + (float) $this->charges;
+        $this->update(['montant_total' => round($totalHt * (1 + (float) $this->tva / 100), 2)]);
+    }
+
+    public function getTotalHtAttribute(): float
+    {
+        return (float) $this->details->sum('prix_total') + (float) $this->charges;
+    }
+
+    public function getMontantTvaAttribute(): float
+    {
+        return round($this->total_ht * (float) $this->tva / 100, 2);
     }
 
     public function scopeParMois($query, int $mois, int $annee)

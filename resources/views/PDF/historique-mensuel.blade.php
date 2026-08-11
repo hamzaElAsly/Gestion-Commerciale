@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>Rapport Mensuel — {{ $nomMois }} {{ $annee }}</title>
+    <title>{{ $titreRapport }}</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'DejaVu Sans', sans-serif; font-size: 11px; color: #1e293b; background: white; }
@@ -84,8 +84,8 @@
             <div class="company" style="margin-top:6px;">Imprimé le {{ now()->format('d/m/Y') }}</div>{{--  à H:i --}}
         </div>
         <div class="header-right">
-            <div class="report-title">Rapport Mensuel des Services</div>
-            <div class="report-sub">{{ ucfirst($nomMois) }} {{ $annee }}</div>
+            <div class="report-title">Rapport des Services</div>
+            <div class="report-sub">{{ $titreRapport }}</div>
         </div>
         
     </div>
@@ -98,7 +98,8 @@
         </div>
         <div class="stat-box">
             <div class="stat-value" style="font-size:16px;">{{ number_format($totalVenteMois, 2) }}</div>
-            <div class="stat-label">CA Total (MAD)</div>
+            <div class="stat-label">CA TTC (MAD)</div>
+            <div style="font-size:9px;color:#64748b;">HT {{ number_format($totalHt, 2) }} · TVA {{ number_format($totalTva, 2) }}</div>
         </div>
         <div class="stat-box">
             <div class="stat-value">{{ $historiques->unique('id_client')->count() }}</div>
@@ -162,7 +163,7 @@
         @empty
         <tr>
             <td colspan="8" style="text-align:center;padding:20px;color:#64748b;">
-                Aucun service pour ce mois.
+                Aucun service pour la période sélectionnée.
             </td>
         </tr>
         @endforelse
@@ -172,7 +173,7 @@
     <tfoot>
         <tr>
             <td colspan="6" class="text-right">
-                TOTAL {{ strtoupper($nomMois) }} {{ $annee }} :
+                TOTAL TTC :
             </td>
             <td colspan="2" class="text-center money" style="color:#1a56db;font-size:14px;">
                 {{ number_format($totalVenteMois, 2) }} MAD
@@ -211,7 +212,7 @@
     @endif
 
     <div class="footer">
-        <div>Ce document est confidentiel — {{ ucfirst($nomMois) }} {{ $annee }}</div>
+        <div>Ce document est confidentiel — {{ $titreRapport }}</div>
         <div style="margin-top: 4px;">
             1 RUE 1 HY SIDI HADI ZOUAGHA RCE NOUR MAG 2 30000 SECTEUR 0502 FES <br>
                 **TEL 06 22 39 00 28***IF68334179***ICE003778507000061 <br>

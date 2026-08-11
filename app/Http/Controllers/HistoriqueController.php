@@ -9,6 +9,9 @@ use App\Models\DetailHistorique;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Validation\ValidationException;
 
 class HistoriqueController extends Controller
 {
@@ -62,6 +65,7 @@ class HistoriqueController extends Controller
             'produits.*.id_produit' => 'required_with:produits|exists:produits,id_produit',
             'produits.*.quantite' => 'required_with:produits|integer|min:1',
             'charges' => 'numeric|min:0',
+            'tva' => ['nullable', 'numeric', 'min:0', 'max:100'],
         ], [
             'id_client.required' => 'Veuillez sélectionner un client.',
             'date_service.required' => 'La date du service est obligatoire.',
@@ -74,6 +78,8 @@ class HistoriqueController extends Controller
         try {
             // ✔ produits optionnel
             $produits = $validated['produits'] ?? [];
+            $charges = (float) ($validated['charges'] ?? 0);
+            $tva = (float) ($validated['tva'] ?? 0);
             // ✅ Vérification stock
             if (!empty($produits)) {
                 foreach ($produits as $item) {
@@ -91,7 +97,8 @@ class HistoriqueController extends Controller
             $historique = Historique::create([
                 'id_client' => $validated['id_client'],
                 'date_service' => $validated['date_service'],
-                'charges' => $validated['charges'],
+                'charges' => $charges,
+                'tva' => $tva,
                 'remarque' => $validated['remarque'] ?? null,
                 'statut' => $validated['statut'],
                 'montant_total' => 0,
@@ -121,10 +128,10 @@ class HistoriqueController extends Controller
             }
 
             // ✅ Ajouter charges même sans produits
-            $montantTotal += $validated['charges'];
-            // ✅ Mise à jour total
+            $montantHt = $montantTotal + $charges;
+            $montantTva = round($montantHt * $tva / 100, 2);
             $historique->update([
-                'montant_total' => $montantTotal
+                'montant_total' => round($montantHt + $montantTva, 2),
             ]);
             DB::commit();
             return redirect()
@@ -164,11 +171,14 @@ class HistoriqueController extends Controller
             'produits.*.id_produit' => 'required_with:produits|exists:produits,id_produit',
             'produits.*.quantite' => 'required_with:produits|integer|min:1',
             'charges' => 'nullable|numeric|min:0',
+            'tva' => ['nullable', 'numeric', 'min:0', 'max:100'],
         ]);
 
         DB::beginTransaction();
         try {
             $produits = $validated['produits'] ?? [];
+            $charges = (float) ($validated['charges'] ?? 0);
+            $tva = (float) ($validated['tva'] ?? 0);
             // 📌 1. Récupérer anciens produits
             $anciensDetails = $historique->details()->get()->keyBy('id_produit');
             // 📌 2. Remettre stock (rollback total ancien)
@@ -176,6 +186,12 @@ class HistoriqueController extends Controller
                 $produit = Produit::find($detail->id_produit);
                 if ($produit) {
                     $produit->increment('quantite_stock', $detail->quantite_utilisee);
+                    $produit->mouvementsStock()->create([
+                        'type_mouvement' => 'ENTREE',
+                        'quantite' => $detail->quantite_utilisee,
+                        'description' => "Restauration avant modification du service #{$historique->id_historique}",
+                        'id_historique' => $historique->id_historique,
+                    ]);
                 }
             }
             // 📌 3. Supprimer anciens détails
@@ -199,17 +215,24 @@ class HistoriqueController extends Controller
                         'prix_total' => $prixTotal,
                     ]);
                     // 🔻 Décrément stock
-                    $produit->decrement('quantite_stock', $item['quantite']);
+                    $produit->decrementerStock(
+                        $item['quantite'],
+                        $historique->id_historique,
+                        "Modification du service #{$historique->id_historique}"
+                    );
                     $montantTotal += $prixTotal;
                 }
             }
 
             // 📌 5. Mettre à jour historique
+            $montantHt = $montantTotal + $charges;
+            $montantTva = round($montantHt * $tva / 100, 2);
             $historique->update([
                 'remarque' => $validated['remarque'] ?? null,
                 'statut' => $validated['statut'],
-                'charges' => $validated['charges'],
-                'montant_total' => $montantTotal + ($validated['charges'] ?? 0),
+                'charges' => $charges,
+                'tva' => $tva,
+                'montant_total' => round($montantHt + $montantTva, 2),
             ]);
 
             DB::commit();
@@ -278,34 +301,81 @@ class HistoriqueController extends Controller
 
     public function imprimerMensuel(Request $request)
     {
-        $mois  = (int) $request->get('mois', now()->month);
-        $annee = (int) $request->get('annee', now()->year);
-        $idClient = $request->get('id_client');
+        $filtres = $request->validate([
+            'annee' => ['nullable', 'integer', 'min:2000', 'max:2100'],
+            'mois' => ['nullable', 'integer', 'between:1,12', 'required_with:jour'],
+            'jour' => ['nullable', 'integer', 'between:1,31'],
+            'id_client' => ['nullable', 'integer', 'exists:clients,id_client'],
+        ]);
 
-        $query = Historique::with(['client', 'details.produit'])
-            ->whereMonth('date_service', $mois)
-            ->whereYear('date_service', $annee)
-            ->orderBy('date_service');
+        $filtres['annee'] = (int) ($filtres['annee'] ?? now()->year);
+        $filtres['mois'] = isset($filtres['mois']) ? (int) $filtres['mois'] : null;
+        $filtres['jour'] = isset($filtres['jour']) ? (int) $filtres['jour'] : null;
 
-        if ($idClient) {$query->where('id_client', $idClient);}
+        if ($filtres['jour'] && ! checkdate($filtres['mois'], $filtres['jour'], $filtres['annee'])) {
+            throw ValidationException::withMessages(['jour' => 'Le jour sélectionné est invalide pour ce mois.']);
+        }
 
+        $query = $this->appliquerFiltresRapport(
+            Historique::with(['client', 'details.produit'])->orderBy('date_service'),
+            $filtres
+        );
         $historiques = $query->get();
-        $totalVenteMois = $historiques->sum('montant_total');
-        $totalAchatMois = DetailHistorique::join('historiques','detail_historiques.id_historique','=','historiques.id_historique')
-            ->join('produits','detail_historiques.id_produit','=','produits.id_produit')
-            ->whereMonth('historiques.date_service', $mois)
-            ->whereYear('historiques.date_service', $annee)
-            ->when($idClient, function ($query) use ($idClient) {$query->where('historiques.id_client', $idClient);})
+        $totalVenteMois = (float) $historiques->sum('montant_total');
+        $totalHt = (float) $historiques->sum(fn (Historique $historique) => $historique->total_ht);
+        $totalTva = round($totalVenteMois - $totalHt, 2);
+
+        $detailsQuery = DetailHistorique::query()
+            ->join('produits', 'detail_historiques.id_produit', '=', 'produits.id_produit')
+            ->whereHas('historique', fn (Builder $query) => $this->appliquerFiltresRapport($query, $filtres));
+        $totalAchatMois = (float) $detailsQuery
             ->sum(DB::raw('detail_historiques.quantite_utilisee * produits.prix_unitaire'));
-                $nomMois = \Carbon\Carbon::create()->month($mois)->locale('fr')->monthName;
-                $clients = Client::orderBy('nom')->get();
+
+        $annee = $filtres['annee'];
+        $mois = $filtres['mois'];
+        $jour = $filtres['jour'];
+        $idClient = $filtres['id_client'] ?? null;
+        $nomMois = $mois ? Carbon::create()->month($mois)->locale('fr')->monthName : null;
+        $titreRapport = $this->titreRapport($annee, $mois, $jour);
+        $clients = Client::orderBy('nom')->get();
 
         if ($request->has('export_pdf')) {
-            $pdf = Pdf::loadView('pdf.historique-mensuel', compact('historiques', 'totalVenteMois', 'nomMois', 'annee', 'mois', 'totalAchatMois'))
+            $pdf = Pdf::loadView('pdf.historique-mensuel', compact('historiques', 'totalVenteMois', 'totalHt', 'totalTva', 'nomMois', 'annee', 'mois', 'jour', 'idClient', 'totalAchatMois', 'titreRapport'))
                         ->setPaper('a4', 'portrait');
-            return $pdf->download("historique-{$nomMois}-{$annee}.pdf");
+            return $pdf->download($this->nomFichierRapport($annee, $mois, $jour));
         }
-        return view('historique.mensuel', compact( 'historiques', 'totalVenteMois', 'nomMois', 'annee', 'mois', 'clients', 'totalAchatMois'));
+        return view('historique.mensuel', compact('historiques', 'totalVenteMois', 'totalHt', 'totalTva', 'nomMois', 'annee', 'mois', 'jour', 'idClient', 'clients', 'totalAchatMois', 'titreRapport'));
+    }
+
+    private function appliquerFiltresRapport(Builder $query, array $filtres): Builder
+    {
+        return $query
+            ->whereYear('date_service', $filtres['annee'])
+            ->when($filtres['mois'] ?? null, fn (Builder $query, int $mois) => $query->whereMonth('date_service', $mois))
+            ->when($filtres['jour'] ?? null, fn (Builder $query, int $jour) => $query->whereDay('date_service', $jour))
+            ->when($filtres['id_client'] ?? null, fn (Builder $query, int $client) => $query->where('id_client', $client));
+    }
+
+    private function titreRapport(int $annee, ?int $mois, ?int $jour): string
+    {
+        if ($mois && $jour) {
+            return 'Rapport journalier — '.Carbon::create($annee, $mois, $jour)->locale('fr')->translatedFormat('d F Y');
+        }
+
+        if ($mois) {
+            return 'Rapport mensuel — '.ucfirst(Carbon::create()->month($mois)->locale('fr')->monthName)." {$annee}";
+        }
+
+        return "Rapport annuel — {$annee}";
+    }
+
+    private function nomFichierRapport(int $annee, ?int $mois, ?int $jour): string
+    {
+        $nom = "rapport-{$annee}";
+        $nom .= $mois ? '-'.str_pad((string) $mois, 2, '0', STR_PAD_LEFT) : '';
+        $nom .= $jour ? '-'.str_pad((string) $jour, 2, '0', STR_PAD_LEFT) : '';
+
+        return "{$nom}.pdf";
     }
 
     public function getProduitInfo(Produit $produit)

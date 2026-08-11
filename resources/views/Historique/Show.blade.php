@@ -67,7 +67,7 @@
         <!-- Montant Total -->
         <div class="card" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white;">
             <div class="card-body text-center py-4">
-                <div style="font-size:13px;opacity:.8;margin-bottom:8px;">Montant Total du Service</div>
+                <div style="font-size:13px;opacity:.8;margin-bottom:8px;">Montant Total TTC du Service</div>
                 <div class="money" style="font-size:32px;font-weight:800;">
                     {{ number_format($historique->montant_total, 2) }}
                 </div>
@@ -109,8 +109,10 @@
                         @endforeach
                     </tbody>
                     <tfoot>
+                        <tr><td colspan="4" class="text-end">Total HT :</td><td class="text-end money">{{ number_format($historique->total_ht, 2) }} MAD</td></tr>
+                        <tr><td colspan="4" class="text-end">TVA ({{ number_format($historique->tva, 2) }} %) :</td><td class="text-end money">{{ number_format($historique->montant_tva, 2) }} MAD</td></tr>
                         <tr style="background: #f8fafc;">
-                            <td colspan="4" class="text-end fw-bold">Total :</td>
+                            <td colspan="4" class="text-end fw-bold">Total TTC :</td>
                             <td class="text-end money fw-bold text-primary">
                                 {{ number_format($historique->montant_total, 2) }} MAD
                             </td>

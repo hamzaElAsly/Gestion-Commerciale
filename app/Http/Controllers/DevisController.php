@@ -33,8 +33,10 @@ class DevisController extends Controller
             'produits.*.nom_produit' => 'required|string|max:255',
             'produits.*.prix' => 'required|numeric|min:0',
             'produits.*.quantite' => 'required|integer|min:1',
-            'tva' => 'required|numeric|min:0|max:100',
+            'tva' => ['nullable', 'numeric', 'min:0', 'max:100'],
         ]);
+
+        $tva = (float) ($validated['tva'] ?? 0);
 
         DB::beginTransaction();
 
@@ -43,7 +45,7 @@ class DevisController extends Controller
             $devis = Devis::create([
                 'titre' => $validated['titre'],
                 'nom_client' => $validated['nom_client'],
-                'tva' => $validated['tva'],
+                'tva' => $tva,
                 'montant_total' => 0
             ]);
             $total = 0;
@@ -60,8 +62,8 @@ class DevisController extends Controller
                 ]);
                 $total += $prixTotal;
             }
-            $validated['tva'] > 0 ? $total += ($total * $validated['tva'] / 100) : null;
-            $devis->update([ 'montant_total' => $total ]);
+            $montantTva = round($total * $tva / 100, 2);
+            $devis->update(['montant_total' => round($total + $montantTva, 2)]);
 
             DB::commit();
 
@@ -75,7 +77,7 @@ class DevisController extends Controller
     // 👁️ SHOW
     public function show($id)
     {
-        $devis = Devis::findOrFail($id);
+        $devis = Devis::with('details')->findOrFail($id);
         return view('devis.show', compact('devis'));
     }
 
@@ -96,8 +98,10 @@ class DevisController extends Controller
             'produits.*.nom_produit' => 'required|string|max:255',
             'produits.*.prix' => 'required|numeric|min:0',
             'produits.*.quantite' => 'required|integer|min:1',
-            'tva' => 'required|numeric|min:0|max:100'
+            'tva' => ['nullable', 'numeric', 'min:0', 'max:100'],
         ]);
+
+        $tva = (float) ($validated['tva'] ?? 0);
 
         DB::beginTransaction();
 
@@ -106,7 +110,7 @@ class DevisController extends Controller
             $devis->update([ 
                 'titre' => $validated['titre'],
                 'nom_client' => $validated['nom_client'],
-                'tva' => $validated['tva']
+                'tva' => $tva,
             ]);
             DetailDevis::where('id_devis', $devis->id_devis)->delete();
             $total = 0;
@@ -123,7 +127,8 @@ class DevisController extends Controller
                 ]);
                 $total += $prixTotal;
             }
-            $devis->update([ 'montant_total' => $total ]);
+            $montantTva = round($total * $tva / 100, 2);
+            $devis->update(['montant_total' => round($total + $montantTva, 2)]);
 
             DB::commit();
 
@@ -139,7 +144,7 @@ class DevisController extends Controller
     // 🗑 DELETE
     public function destroy($id)
     {
-        $devis = Devis::findOrFail($id);
+        $devis = Devis::with('details')->findOrFail($id);
         $devis->delete();
 
         return redirect()->route('devis.index')

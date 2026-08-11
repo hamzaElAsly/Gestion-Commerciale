@@ -56,17 +56,21 @@
                         <button type="button" class="btn btn-primary" onclick="addRow()">+ Ajouter produit</button>
                       </div>
                       <div class="w-50 mb-3 float-start">
-                        <input type="number" name="tva" class="form-control" placeholder="TVA (%)" min="0" max="100" step="0.01" required>
+                        <label class="form-label" for="tva">TVA (%)</label>
+                        <input type="number" id="tva" name="tva" value="{{ old('tva', 0) }}"
+                            class="form-control @error('tva') is-invalid @enderror" placeholder="TVA (%)"
+                            min="0" max="100" step="0.01">
+                        @error('tva')<div class="invalid-feedback">{{ $message }}</div>@enderror
                       </div>
                       <div class="w-25 mb-3 float-end">
-                        <h4 class="mt-3">Total: 
-                            <span id="grand-total">
-                              0.00
-                            </span> MAD
+                        <div class="mt-3 text-end">
+                            <div>Total HT : <strong><span id="total-ht">0.00</span> MAD</strong></div>
+                            <div>TVA (<span id="tva-taux">0.00</span> %) : <strong><span id="montant-tva">0.00</span> MAD</strong></div>
+                            <h4>Total TTC : <span id="grand-total">0.00</span> MAD</h4>
                             <noscript>
                                 <small class="text-danger">(Calculé sans JavaScript)</small>
                             </noscript>
-                        </h4>
+                        </div>
                       </div>
                     </div>
                     <button type="submit" class="btn btn-success mt-3">Enregistrer</button>
@@ -106,12 +110,16 @@ function addRow() {
 }
 
 function calculateTotal() {
-    let total = 0;
+    let totalHt = 0;
     document.querySelectorAll('.total').forEach(el => {
-        total += parseFloat(el.value) || 0;
+        totalHt += parseFloat(el.value) || 0;
     });
-
-    document.getElementById('grand-total').innerText = total.toFixed(2);
+    const tva = parseFloat(document.getElementById('tva').value) || 0;
+    const montantTva = totalHt * tva / 100;
+    document.getElementById('total-ht').innerText = totalHt.toFixed(2);
+    document.getElementById('tva-taux').innerText = tva.toFixed(2);
+    document.getElementById('montant-tva').innerText = montantTva.toFixed(2);
+    document.getElementById('grand-total').innerText = (totalHt + montantTva).toFixed(2);
 }
 
 function calculateRow(element) {
@@ -123,7 +131,16 @@ function calculateRow(element) {
     calculateTotal();
 }
 
-function removeRow(button) { button.closest('tr').remove(); }
+function removeRow(button) {
+    button.closest('tr').remove();
+    calculateTotal();
+}
+
+document.getElementById('tva').addEventListener('input', calculateTotal);
+document.addEventListener('DOMContentLoaded', function () {
+    addRow();
+    calculateTotal();
+});
 
 </script>
 @endsection
