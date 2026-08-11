@@ -22,16 +22,17 @@
     @endif
 
     <!-- TABLE -->
-    <div class="card p-3">
-        <table class="table table-bordered table-hover">
-            <thead class="table-dark">
+    <div class="card">
+        <div class="table-responsive">
+        <table class="table mb-0">
+            <thead>
                 <tr>
                     <th>#</th>
                     <th>Titre</th>
                     <th>Client</th>
                     <th>Date</th>
                     <th>Total</th>
-                    <th width="250">Actions</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
 
@@ -49,24 +50,21 @@
                     </td>
 
                     <td>
-                        <a href="{{ route('devis.show', $d->id_devis) }}" class="btn btn-info btn-sm">
-                            👁️
+                        <a href="{{ route('devis.show', $d->id_devis) }}" class="btn btn-sm btn-light" title="Voir">
+                            <i class="bi bi-eye"></i>
                         </a>
-
-                        <a href="{{ route('devis.edit', $d->id_devis) }}" class="btn btn-warning btn-sm">
-                            ✏️
+                        <a href="{{ route('devis.edit', $d->id_devis) }}" class="btn btn-sm btn-light" title="Modifier">
+                            <i class="bi bi-pencil"></i>
                         </a>
-
-                        <a href="{{ route('devis.print', $d->id_devis) }}" class="btn btn-danger btn-sm">
-                            PDF
+                        <a href="{{ route('devis.print', $d->id_devis) }}" class="btn btn-sm btn-light" title="Imprimer facture" 
+                            target="_blank"> <i class="bi bi-printer"></i>
                         </a>
-
                         <form action="{{ route('devis.destroy', $d->id_devis) }}" method="POST" style="display:inline;">
                             @csrf
                             @method('DELETE')
-                            <button class="btn btn-dark btn-sm"
+                            <button class="btn btn-sm btn-light text-danger" title="Supprimer"
                                 onclick="return confirm('Supprimer ce devis ?')">
-                                🗑
+                                <i class="bi bi-trash"></i>
                             </button>
                         </form>
                     </td>
@@ -82,6 +80,7 @@
         <!-- PAGINATION -->
         <div class="mt-3">
             {{ $devis->links() }}
+        </div>
         </div>
 
     </div>
