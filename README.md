@@ -1,8 +1,8 @@
-# Charrak TECHNOLOGIE — Application de Gestion Commerciale & Stock
+# Charrak TECHNOLOGY — Application de Gestion Commerciale & Stock
 
 ## 1_ Présentation
 
-**Charrak TECHNOLOGIE** est une application web complète destinée aux artisans, techniciens et petites entreprises de services qui ont besoin de :
+**Charrak TECHNOLOGY** est une application web complète destinée aux artisans, techniciens et petites entreprises de services qui ont besoin de :
 
 - Suivre leurs **clients** et l'historique des services réalisés
 - Gérer leur **catalogue de produits** et **catégories**
@@ -63,9 +63,9 @@
 
 ---
 
-## 3_ Technologies utilisées
+## 3_ TECHNOLOGYs utilisées
 
-| Composant       | Technologie            | Version |
+| Composant       | TECHNOLOGY            | Version |
 |-----------------|------------------------|---------|
 | Framework       | Laravel                | 12.x    |
 | Langage         | PHP                    | 8.5+    |
@@ -428,6 +428,6 @@ Développé avec [hamzaElAsly](https://github.com/hamzaElAsly) pour un projet de
 
 ---
 
-<p align="center"> **Charrak TECHNOLOGIE** — Gestion Commerciale Professionnelle<br>
+<p align="center"> **Charrak TECHNOLOGY** — Gestion Commerciale Professionnelle<br>
   <em>Fait avec Laravel et Bootstrap 5</em>
 </p>
