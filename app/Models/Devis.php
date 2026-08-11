@@ -17,9 +17,11 @@ class Devis extends Model
         'titre',
         'id_devis',
         'nom_client',
+        'tva',
         'montant_total',
     ];
     protected $casts = [
+        'tva' => 'decimal:2',
         'montant_total' => 'decimal:2',
     ];
 

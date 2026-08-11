@@ -51,12 +51,14 @@
                         <tbody>
                         </tbody>
                     </table>
-                    {{-- <h4 class="mt-3">Total Général : <span id="grand-total">0.00</span> DH</h4> --}}
                     <div class="row d-flex justify-content-between">
-                      <div class="w-50 mb-3 float-start">
+                      <div class="w-25 mb-3 float-start">
                         <button type="button" class="btn btn-primary" onclick="addRow()">+ Ajouter produit</button>
                       </div>
-                      <div class="w-50 mb-3 float-end">
+                      <div class="w-50 mb-3 float-start">
+                        <input type="number" name="tva" class="form-control" placeholder="TVA (%)" min="0" max="100" step="0.01" required>
+                      </div>
+                      <div class="w-25 mb-3 float-end">
                         <h4 class="mt-3">Total: 
                             <span id="grand-total">
                               0.00

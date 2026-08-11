@@ -33,6 +33,7 @@ class DevisController extends Controller
             'produits.*.nom_produit' => 'required|string|max:255',
             'produits.*.prix' => 'required|numeric|min:0',
             'produits.*.quantite' => 'required|integer|min:1',
+            'tva' => 'required|numeric|min:0|max:100',
         ]);
 
         DB::beginTransaction();
@@ -42,6 +43,7 @@ class DevisController extends Controller
             $devis = Devis::create([
                 'titre' => $validated['titre'],
                 'nom_client' => $validated['nom_client'],
+                'tva' => $validated['tva'],
                 'montant_total' => 0
             ]);
             $total = 0;
@@ -58,13 +60,12 @@ class DevisController extends Controller
                 ]);
                 $total += $prixTotal;
             }
+            $validated['tva'] > 0 ? $total += ($total * $validated['tva'] / 100) : null;
             $devis->update([ 'montant_total' => $total ]);
 
             DB::commit();
 
-            return redirect()
-                ->route('devis.show', $devis)
-                ->with('success', 'Devis créé avec succès');
+            return redirect()->route('devis.show', $devis)->with('success', 'Devis créé avec succès');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withInput()->with('error', $e->getMessage());
@@ -83,7 +84,6 @@ class DevisController extends Controller
     {
         $devis = Devis::with('details')->findOrFail($id);
         return view('devis.edit', compact('devis'));
-        
     }
 
     // 🔄 UPDATE
@@ -96,6 +96,7 @@ class DevisController extends Controller
             'produits.*.nom_produit' => 'required|string|max:255',
             'produits.*.prix' => 'required|numeric|min:0',
             'produits.*.quantite' => 'required|integer|min:1',
+            'tva' => 'required|numeric|min:0|max:100'
         ]);
 
         DB::beginTransaction();
@@ -104,8 +105,9 @@ class DevisController extends Controller
             $devis = Devis::findOrFail($id);
             $devis->update([ 
                 'titre' => $validated['titre'],
-                'nom_client' => $validated['nom_client'] ]
-            );
+                'nom_client' => $validated['nom_client'],
+                'tva' => $validated['tva']
+            ]);
             DetailDevis::where('id_devis', $devis->id_devis)->delete();
             $total = 0;
             foreach ($validated['produits'] as $item) {
